@@ -81,6 +81,14 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     });
 });
 
+// Logo Router (Routes to Learn view without refreshing)
+document.querySelectorAll('.logo-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevents the page from jumping to the top or refreshing
+        document.querySelector('.nav-btn[data-view="learn"]').click(); // Simulates a click on the Library button
+    });
+});
+
 // ==========================================
 // LEARN LIBRARY LOGIC
 // ==========================================

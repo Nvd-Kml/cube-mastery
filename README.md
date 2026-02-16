@@ -18,7 +18,8 @@ Access it here: https://nvd-kml.github.io/cube-mastery/
 * **Custom Drill Sessions:** Check off individual cases or entire subsets to build a custom training queue. The engine randomizes the queue to prevent sequential memorization.
 * **WCA-Style Stopwatch:** Hold the `Spacebar` to ready the timer (turns green), release to start, and tap again to stop.
 * **Auto-Generated Setups:** The engine automatically calculates and displays the exact reverse-scramble needed to set up your cube for the active case.
-* **Quality of Life Toggles:** * **Auto-Next:** Automatically advances to the next scramble 1 second after stopping the timer.
+* **Quality of Life Toggles:** 
+  * **Auto-Next:** Automatically advances to the next scramble 1 second after stopping the timer.
   * **Show Hint:** Toggles the optimal solution on the screen if you forget an algorithm mid-solve.
 
 ## 🚀 Running the Project Locally
