@@ -45,10 +45,24 @@
             </a>
         </header>
 
+        <div class="flex-1 flex flex-col h-full relative overflow-hidden">
+
+        <header class="md:hidden bg-slate-950 border-b border-slate-800 p-4 flex justify-between items-center z-20">
+            <a href="#" class="logo-link font-bold text-2xl tracking-tighter text-blue-500 hover:opacity-80 transition-opacity">
+                Cube<span class="text-white">Mastery</span>
+            </a>
+        </header>
+
         <main class="flex-1 overflow-y-auto relative bg-slate-900 flex flex-col">
             
             <section id="view-learn" class="view-section w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 block">
-                <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur border-b border-slate-800 pb-4 mb-6 pt-2">
+                
+                <div class="mb-2">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2">Algorithm Library</h2>
+                    <p class="text-slate-400 text-sm md:text-base">Browse, search, and learn optimal CFOP algorithms and their alternatives.</p>
+                </div>
+
+                <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur border-b border-slate-800 pb-4 mb-6 pt-4">
                     <div class="flex bg-slate-800 p-1 rounded-lg border border-slate-700 w-fit mb-4">
                         <button id="tab-f2l" class="stage-tab px-4 sm:px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg text-sm sm:text-base">F2L</button>
                         <button id="tab-oll" class="stage-tab px-4 sm:px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm sm:text-base">OLL</button>
@@ -72,39 +86,48 @@
 
             <section id="view-train" class="view-section w-full h-full flex flex-col hidden overflow-hidden">
                 
-                <div id="train-setup-panel" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col animate-fade-in max-w-7xl mx-auto w-full">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-6 border-b border-slate-800">
-                        <div>
+                <div id="train-setup-panel" class="flex-1 overflow-y-auto w-full animate-fade-in">
+                    <div class="max-w-7xl mx-auto w-full p-4 md:p-8 flex flex-col pb-6 md:pb-24">
+                        
+                        <div class="mb-2">
                             <h2 class="text-2xl md:text-3xl font-bold mb-2">Trainer Setup</h2>
-                            <p class="text-slate-400 text-sm md:text-base">Select cases to drill. Queue is shuffled randomly.</p>
+                            <p class="text-slate-400 text-sm md:text-base">Select cases to drill. The queue will be shuffled randomly.</p>
                         </div>
-                        <div class="flex flex-col md:items-end gap-4 w-full md:w-auto">
-                            <div class="flex bg-slate-800 p-1 rounded-lg border border-slate-700 w-full md:w-auto justify-center">
-                                <button id="train-tab-f2l" class="train-stage-tab flex-1 md:flex-none px-4 md:px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg text-sm md:text-base" data-stage="F2L">F2L</button>
-                                <button id="train-tab-oll" class="train-stage-tab flex-1 md:flex-none px-4 md:px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm md:text-base" data-stage="OLL">OLL</button>
-                                <button id="train-tab-pll" class="train-stage-tab flex-1 md:flex-none px-4 md:px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm md:text-base" data-stage="PLL">PLL</button>
+
+                        <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur border-b border-slate-800 pb-4 mb-6 pt-4">
+                            
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                                <div class="flex bg-slate-800 p-1 rounded-lg border border-slate-700 w-full md:w-fit justify-center md:justify-start">
+                                    <button id="train-tab-f2l" class="train-stage-tab flex-1 md:flex-none px-4 md:px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg text-sm md:text-base" data-stage="F2L">F2L</button>
+                                    <button id="train-tab-oll" class="train-stage-tab flex-1 md:flex-none px-4 md:px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm md:text-base" data-stage="OLL">OLL</button>
+                                    <button id="train-tab-pll" class="train-stage-tab flex-1 md:flex-none px-4 md:px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm md:text-base" data-stage="PLL">PLL</button>
+                                </div>
+                                
+                                <button id="start-selected-btn" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 md:py-2 px-8 rounded-lg shadow-lg shadow-emerald-500/20 transition-all text-lg">
+                                    Start Session <i class="fa-solid fa-play ml-2"></i>
+                                </button>
                             </div>
-                            <button id="start-selected-btn" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-emerald-500/20 transition-all text-lg">
-                                Start Session <i class="fa-solid fa-play ml-2"></i>
-                            </button>
+
+                            <div id="train-filter-pills" class="flex flex-wrap gap-2 mb-4"></div>
+
+                            <div class="flex flex-wrap gap-2 justify-between items-center">
+                                <div class="flex gap-2 w-full sm:w-auto">
+                                    <button id="btn-select-all" class="flex-1 sm:flex-none text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg border border-slate-700 transition-colors">
+                                        <i class="fa-solid fa-check-double mr-2"></i>Select Displayed
+                                    </button>
+                                    <button id="btn-deselect-all" class="flex-1 sm:flex-none text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg border border-slate-700 transition-colors">
+                                        <i class="fa-solid fa-eraser mr-2"></i>Clear Displayed
+                                    </button>
+                                </div>
+                                <span id="train-selection-count" class="text-sm font-bold text-blue-400 mx-auto sm:ml-auto sm:mr-0 mt-2 sm:mt-0">
+                                    0 Cases Selected
+                                </span>
+                            </div>
                         </div>
+
+                        <div id="trainer-case-list" class="flex-1"></div>
+
                     </div>
-
-                    <div id="train-filter-pills" class="flex flex-wrap gap-2 mb-6"></div>
-
-                    <div class="flex flex-wrap gap-2 mb-6 items-center">
-                        <button id="btn-select-all" class="text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg border border-slate-700 transition-colors">
-                            <i class="fa-solid fa-check-double mr-2"></i>Select All
-                        </button>
-                        <button id="btn-deselect-all" class="text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg border border-slate-700 transition-colors">
-                            <i class="fa-solid fa-eraser mr-2"></i>Clear All
-                        </button>
-                        <span id="train-selection-count" class="ml-auto w-full sm:w-auto text-right sm:text-left mt-2 sm:mt-0 text-sm font-bold text-blue-400">
-                            0 Cases Selected
-                        </span>
-                    </div>
-
-                    <div id="trainer-case-list" class="flex-1 pb-6 md:pb-24"></div>
                 </div>
 
                 <div id="train-active-panel" class="flex-1 flex flex-col hidden relative animate-fade-in touch-none">
@@ -165,6 +188,19 @@
                 </div>
             </section>
         </main>
+
+        <nav class="md:hidden bg-slate-950 border-t border-slate-800 flex justify-around p-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+            <button class="nav-btn mobile-nav flex-1 flex flex-col items-center p-2 rounded-lg text-blue-400 transition-colors" data-view="learn">
+                <i class="fa-solid fa-book-open text-xl mb-1"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Library</span>
+            </button>
+            <button class="nav-btn mobile-nav flex-1 flex flex-col items-center p-2 rounded-lg text-slate-500 hover:text-slate-300 transition-colors" data-view="train">
+                <i class="fa-solid fa-stopwatch text-xl mb-1"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Trainer</span>
+            </button>
+        </nav>
+
+    </div>
 
         <nav class="md:hidden bg-slate-950 border-t border-slate-800 flex justify-around p-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
             <button class="nav-btn mobile-nav flex-1 flex flex-col items-center p-2 rounded-lg text-blue-400 transition-colors" data-view="learn">
