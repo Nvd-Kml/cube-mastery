@@ -1,3 +1,4 @@
+// /js/app.js
 import { f2lCases, ollCases, pllCases } from './data.js';
 
 // --- Local Storage Stats Engine ---
@@ -45,14 +46,28 @@ function getCategories(data) {
 }
 
 // ==========================================
-// VIEW ROUTER
+// VIEW ROUTER (Desktop + Mobile Nav Sync)
 // ==========================================
+const desktopInactive = 'nav-btn desktop-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all';
+const desktopActive = 'nav-btn desktop-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all bg-blue-600/10 text-blue-400 font-bold border border-blue-500/20';
+
+const mobileInactive = 'nav-btn mobile-nav flex-1 flex flex-col items-center p-2 rounded-lg text-slate-500 hover:text-slate-300 transition-colors';
+const mobileActive = 'nav-btn mobile-nav flex-1 flex flex-col items-center p-2 rounded-lg text-blue-400 transition-colors';
+
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.nav-btn').forEach(b => b.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all');
-        e.currentTarget.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all bg-blue-600/10 text-blue-400 font-bold border border-blue-500/20';
-        
         currentView = e.currentTarget.getAttribute('data-view');
+
+        // Sync Desktop buttons
+        document.querySelectorAll('.desktop-nav').forEach(b => {
+            b.className = b.getAttribute('data-view') === currentView ? desktopActive : desktopInactive;
+        });
+        
+        // Sync Mobile buttons
+        document.querySelectorAll('.mobile-nav').forEach(b => {
+            b.className = b.getAttribute('data-view') === currentView ? mobileActive : mobileInactive;
+        });
+        
         document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
         document.getElementById(`view-${currentView}`).classList.remove('hidden');
         
@@ -61,7 +76,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
             document.getElementById('train-setup-panel').classList.remove('hidden');
             renderTrainerSetup();
         } else if (currentView === 'learn') {
-            renderCards(); // Re-render to show updated PBs
+            renderCards(); 
         }
     });
 });
@@ -111,7 +126,6 @@ function renderCards() {
         let imgUrl = `https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=150&stage=${config.stageStr}&bg=t&sch=y,r,g,w,o,b&case=${encodeURIComponent(urlAlg)}`;
         if (config.viewStr) imgUrl += `&view=${config.viewStr}`;
 
-        // Get PB for this case
         const pb = getPB(currentStage, c.id);
         const pbHtml = pb ? `<span class="bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 px-2 py-1 rounded text-xs font-bold flex items-center"><i class="fa-solid fa-trophy mr-1"></i> PB: ${pb}s</span>` : '';
 
@@ -120,26 +134,26 @@ function renderCards() {
             altsHtml += `<div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative 1</span><p class="font-mono text-slate-300">${c.alts[0]}</p></div>`;
             if (c.alts.length > 1) {
                 let extraAlts = c.alts.slice(1).map((alt, i) => `<div class="p-3 mt-2 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative ${i + 2}</span><p class="font-mono text-slate-300">${alt}</p></div>`).join('');
-                altsHtml += `<details class="group mt-2"><summary class="cursor-pointer text-sm font-bold text-blue-400 hover:text-blue-300 flex items-center select-none"><i class="fa-solid fa-chevron-right mr-2 transition-transform duration-200 group-open:rotate-90"></i>Show ${c.alts.length - 1} More</summary><div class="mt-2 pl-3 border-l-2 border-blue-500/30 space-y-2 animate-fade-in">${extraAlts}</div></details>`;
+                altsHtml += `<details class="group mt-2"><summary class="cursor-pointer text-sm font-bold text-blue-400 hover:text-blue-300 flex items-center select-none py-2"><i class="fa-solid fa-chevron-right mr-2 transition-transform duration-200 group-open:rotate-90"></i>Show ${c.alts.length - 1} More</summary><div class="mt-2 pl-3 border-l-2 border-blue-500/30 space-y-2 animate-fade-in">${extraAlts}</div></details>`;
             }
         } else if (c.alt) {
             altsHtml += `<div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative</span><p class="font-mono text-slate-300">${c.alt}</p></div>`;
         }
 
         return `
-        <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 cube-hover flex flex-col sm:flex-row items-start gap-6 animate-fade-in relative">
-            <div class="flex-shrink-0 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center gap-4 h-auto w-36">
-                <img src="${imgUrl}" alt="${config.prefix} Case ${c.id}" class="w-full h-auto object-contain">
-                <button class="train-this-btn w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2 rounded transition-colors" data-id="${c.id}" data-stage="${currentStage}">Train Case</button>
+        <div class="bg-slate-800 rounded-2xl p-4 sm:p-6 border border-slate-700 cube-hover flex flex-col sm:flex-row items-start gap-4 sm:gap-6 animate-fade-in relative">
+            <div class="flex-shrink-0 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center gap-4 h-auto w-full sm:w-40 mx-auto">
+                <img src="${imgUrl}" alt="${config.prefix} Case ${c.id}" class="w-full h-auto object-contain max-w-[8rem] sm:max-w-none">
+                <button class="train-this-btn w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 sm:py-2 rounded transition-colors" data-id="${c.id}" data-stage="${currentStage}">Train Case</button>
             </div>
             <div class="flex-grow w-full">
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex flex-wrap gap-2 justify-between items-center mb-2">
                     <h3 class="text-xl font-bold">${config.prefix} ${c.id} <span class="text-sm font-normal text-slate-400 ml-2">${c.cat}</span></h3>
                     ${pbHtml}
                 </div>
                 <div class="space-y-3 mt-4">
-                    <div class="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10"><span class="block text-xs text-blue-400 font-bold mb-1">Setup Scramble</span><p class="font-mono text-sm text-blue-300">${setupScramble}</p></div>
-                    <div class="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10"><span class="block text-xs text-emerald-400 font-bold mb-1">Optimal Solution</span><p class="font-mono text-lg text-emerald-400 optimal-algo">${c.opt}</p></div>
+                    <div class="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10"><span class="block text-xs text-blue-400 font-bold mb-1">Setup Scramble</span><p class="font-mono text-sm text-blue-300 break-words">${setupScramble}</p></div>
+                    <div class="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10"><span class="block text-xs text-emerald-400 font-bold mb-1">Optimal Solution</span><p class="font-mono text-base sm:text-lg text-emerald-400 optimal-algo break-words">${c.opt}</p></div>
                     ${altsHtml}
                 </div>
             </div>
@@ -155,8 +169,8 @@ function renderCards() {
 
 document.querySelectorAll('.stage-tab').forEach(tab => {
     tab.addEventListener('click', (e) => {
-        document.querySelectorAll('.stage-tab').forEach(t => t.className = 'stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white');
-        e.target.className = 'stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg';
+        document.querySelectorAll('.stage-tab').forEach(t => t.className = 'stage-tab px-4 sm:px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm sm:text-base');
+        e.target.className = 'stage-tab px-4 sm:px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg text-sm sm:text-base';
         currentStage = e.target.id.replace('tab-', '').toUpperCase();
         currentCategory = 'All';
         renderApp();
@@ -219,10 +233,10 @@ function renderTrainerSetup() {
         html += `
         <div class="mb-8 animate-fade-in">
             <div class="flex items-center mb-4">
-                <input type="checkbox" id="cat-${cat.replace(/\s+/g, '-')}" class="cat-checkbox w-5 h-5 text-blue-600 bg-slate-900 border-slate-600 rounded focus:ring-blue-500" data-cat="${cat}" ${allChecked ? 'checked' : ''}>
-                <label for="cat-${cat.replace(/\s+/g, '-')}" class="ml-3 text-xl font-bold text-white cursor-pointer select-none">${cat}</label>
+                <input type="checkbox" id="cat-${cat.replace(/\s+/g, '-')}" class="cat-checkbox w-6 h-6 text-blue-600 bg-slate-900 border-slate-600 rounded focus:ring-blue-500" data-cat="${cat}" ${allChecked ? 'checked' : ''}>
+                <label for="cat-${cat.replace(/\s+/g, '-')}" class="ml-3 text-lg md:text-xl font-bold text-white cursor-pointer select-none">${cat}</label>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 pl-8">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 pl-0 sm:pl-8">
         `;
         
         catCases.forEach(c => {
@@ -234,7 +248,7 @@ function renderTrainerSetup() {
             html += `
                 <label class="relative flex flex-col items-center p-3 border-2 border-slate-700 bg-slate-800/50 rounded-xl cursor-pointer hover:bg-slate-700 transition-colors ${isChecked ? 'border-blue-500 bg-blue-600/20' : ''}">
                     <div class="absolute top-2 left-2">
-                        <input type="checkbox" class="case-checkbox w-4 h-4 text-blue-600 bg-slate-900 border-slate-600 rounded focus:ring-blue-500" value="${c.id}" data-cat="${cat}" ${isChecked ? 'checked' : ''}>
+                        <input type="checkbox" class="case-checkbox w-5 h-5 text-blue-600 bg-slate-900 border-slate-600 rounded focus:ring-blue-500 pointer-events-none" value="${c.id}" data-cat="${cat}" ${isChecked ? 'checked' : ''}>
                     </div>
                     <img src="${imgUrl}" class="w-16 h-16 mb-2 pointer-events-none" />
                     <span class="text-sm font-bold text-slate-300 pointer-events-none">${config.prefix} ${c.id}</span>
@@ -247,9 +261,15 @@ function renderTrainerSetup() {
     document.getElementById('trainer-case-list').innerHTML = html;
     
     document.querySelectorAll('.case-checkbox').forEach(box => {
-        box.addEventListener('change', (e) => {
-            if (e.target.checked) selectedTrainCases.add(e.target.value);
-            else selectedTrainCases.delete(e.target.value);
+        // Use click on parent label rather than change on checkbox for better mobile tap areas
+        box.closest('label').addEventListener('click', (e) => {
+            e.preventDefault();
+            const checkbox = e.currentTarget.querySelector('.case-checkbox');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) selectedTrainCases.add(checkbox.value);
+            else selectedTrainCases.delete(checkbox.value);
+            
             renderTrainerSetup();
             updateSelectionCount();
         });
@@ -269,8 +289,8 @@ function renderTrainerSetup() {
 
 document.querySelectorAll('.train-stage-tab').forEach(tab => {
     tab.addEventListener('click', (e) => {
-        document.querySelectorAll('.train-stage-tab').forEach(t => t.className = 'train-stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white');
-        e.target.className = 'train-stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg';
+        document.querySelectorAll('.train-stage-tab').forEach(t => t.className = 'train-stage-tab flex-1 md:flex-none px-4 md:px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm md:text-base');
+        e.target.className = 'train-stage-tab flex-1 md:flex-none px-4 md:px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg text-sm md:text-base';
         trainSelectedStage = e.target.getAttribute('data-stage');
         trainCurrentCategory = 'All'; 
         selectedTrainCases.clear(); 
@@ -293,7 +313,7 @@ document.getElementById('btn-deselect-all').addEventListener('click', () => {
 });
 
 // ==========================================
-// TIMER EXECUTION
+// TIMER EXECUTION & TOUCH MECHANICS
 // ==========================================
 let timerState = 'IDLE'; 
 let startTime = 0;
@@ -308,6 +328,8 @@ const showSolutionToggle = document.getElementById('show-solution-toggle');
 const solutionContainer = document.getElementById('train-solution-container');
 const solutionText = document.getElementById('train-solution');
 const trainPbDisplay = document.getElementById('train-pb-display');
+const trainPbText = document.getElementById('train-pb-text');
+const trainActivePanel = document.getElementById('train-active-panel');
 
 showSolutionToggle.addEventListener('change', () => {
     if (trainQueue.length > 0 && currentTrainIndex < trainQueue.length) {
@@ -335,7 +357,7 @@ function trainSpecificCase(stage, id) {
         currentTrainIndex = 0;
         trainSelectedStage = stage;
         
-        document.querySelector('[data-view="train"]').click();
+        document.querySelector('.mobile-nav[data-view="train"]').click();
         document.getElementById('train-setup-panel').classList.add('hidden');
         document.getElementById('train-active-panel').classList.remove('hidden');
         loadActiveTrainCase();
@@ -345,7 +367,7 @@ function trainSpecificCase(stage, id) {
 function updateTrainerPBUI(stage, id) {
     const pb = getPB(stage, id);
     if (pb) {
-        trainPbDisplay.innerHTML = `<i class="fa-solid fa-trophy mr-2"></i>PB: ${pb}s`;
+        trainPbText.textContent = `${pb}s`;
         trainPbDisplay.classList.remove('hidden');
     } else {
         trainPbDisplay.classList.add('hidden');
@@ -402,46 +424,58 @@ function updateTimer() {
     timerDisplay.textContent = ((Date.now() - startTime) / 1000).toFixed(2);
 }
 
-window.addEventListener('keydown', (e) => {
-    if (document.getElementById('train-active-panel').classList.contains('hidden') || currentView !== 'train' || trainQueue.length === 0) return;
+function handleTimerDown(e) {
+    // Ignore if clicking a button or toggle switch
+    if (e.target.closest('button') || e.target.closest('label') || e.target.tagName === 'INPUT') return;
     
-    if (e.code === 'Space') {
-        e.preventDefault(); 
-        if (timerState === 'IDLE' || timerState === 'STOPPED') {
-            timerState = 'READY';
-            timerDisplay.style.color = '#22c55e'; // Green
-        } 
-        else if (timerState === 'RUNNING') {
-            timerState = 'STOPPED';
-            clearInterval(timerInterval);
-            let finalTimeMs = Date.now() - startTime;
-            timerDisplay.textContent = (finalTimeMs / 1000).toFixed(2);
-            
-            // --- SAVE TIME TO STATS ---
-            const currentCase = trainQueue[currentTrainIndex];
-            saveTime(trainSelectedStage, currentCase.id, finalTimeMs);
-            updateTrainerPBUI(trainSelectedStage, currentCase.id);
-            
-            if (autoNextToggle.checked && currentTrainIndex < trainQueue.length) {
-                setTimeout(() => {
-                    currentTrainIndex++;
-                    loadActiveTrainCase();
-                }, 1000); 
-            } else if (currentTrainIndex < trainQueue.length) {
-                manualNextBtn.classList.remove('hidden');
-            }
+    if (trainActivePanel.classList.contains('hidden') || currentView !== 'train' || trainQueue.length === 0) return;
+    
+    if (e.type === 'keydown' && e.code !== 'Space') return;
+    if (e.type === 'keydown') e.preventDefault();
+    
+    if (timerState === 'IDLE' || timerState === 'STOPPED') {
+        timerState = 'READY';
+        timerDisplay.style.color = '#22c55e'; 
+    } 
+    else if (timerState === 'RUNNING') {
+        timerState = 'STOPPED';
+        clearInterval(timerInterval);
+        let finalTimeMs = Date.now() - startTime;
+        timerDisplay.textContent = (finalTimeMs / 1000).toFixed(2);
+        
+        const currentCase = trainQueue[currentTrainIndex];
+        saveTime(trainSelectedStage, currentCase.id, finalTimeMs);
+        updateTrainerPBUI(trainSelectedStage, currentCase.id);
+        
+        if (autoNextToggle.checked && currentTrainIndex < trainQueue.length) {
+            setTimeout(() => {
+                currentTrainIndex++;
+                loadActiveTrainCase();
+            }, 1000); 
+        } else if (currentTrainIndex < trainQueue.length) {
+            manualNextBtn.classList.remove('hidden');
         }
     }
-});
+}
 
-window.addEventListener('keyup', (e) => {
-    if (e.code === 'Space' && timerState === 'READY') {
+function handleTimerUp(e) {
+    if (e.type === 'keyup' && e.code !== 'Space') return;
+    
+    if (timerState === 'READY') {
         timerState = 'RUNNING';
         timerDisplay.style.color = 'white';
         startTime = Date.now();
         timerInterval = setInterval(updateTimer, 10);
     }
-});
+}
+
+// Attach Desktop Keyboard Events
+window.addEventListener('keydown', handleTimerDown);
+window.addEventListener('keyup', handleTimerUp);
+
+// Attach Mobile Touch Events (Transforms the whole panel into a touch target)
+trainActivePanel.addEventListener('touchstart', handleTimerDown, {passive: false});
+trainActivePanel.addEventListener('touchend', handleTimerUp);
 
 manualNextBtn.addEventListener('click', () => {
     currentTrainIndex++;
@@ -459,7 +493,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderApp();
     renderTrainerSetup();
     
-    // Register Service Worker for Offline PWA Support
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
         .then(reg => console.log('Service Worker Registered!', reg))
