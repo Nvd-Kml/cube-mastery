@@ -27,8 +27,56 @@ function generateCards(data, containerId, stageStr, viewStr, prefix) {
         let imgUrl = `https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=150&stage=${stageStr}&bg=t&sch=y,r,g,w,o,b&case=${encodeURIComponent(urlAlg)}`;
         if (viewStr) imgUrl += `&view=${viewStr}`;
 
+        // --- Build the Alternatives HTML block ---
+        let altsHtml = '';
+        
+        // Check if the new 'alts' array exists and has items (New F2L format)
+        if (c.alts && c.alts.length > 0) {
+            
+            // Always show the 1st alternative
+            altsHtml += `
+            <div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50">
+                <span class="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Alternative 1</span>
+                <p class="font-mono text-slate-300">${c.alts[0]}</p>
+            </div>`;
+
+            // If there are more than 1 alternatives, wrap the rest in a collapsible accordion
+            if (c.alts.length > 1) {
+                let extraAlts = '';
+                for (let i = 1; i < c.alts.length; i++) {
+                    extraAlts += `
+                    <div class="p-3 mt-2 rounded-lg border border-slate-700 bg-slate-900/50">
+                        <span class="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Alternative ${i + 1}</span>
+                        <p class="font-mono text-slate-300">${c.alts[i]}</p>
+                    </div>`;
+                }
+                
+                // The <details> tag creates a native accordion. 
+                // Tailwind's 'group' and 'group-open' classes animate the arrow rotation.
+                altsHtml += `
+                <details class="group mt-2">
+                    <summary class="cursor-pointer text-sm font-bold text-blue-400 hover:text-blue-300 flex items-center select-none transition-colors">
+                        <i class="fa-solid fa-chevron-right mr-2 transition-transform duration-200 group-open:rotate-90"></i>
+                        Show ${c.alts.length - 1} More Alternatives
+                    </summary>
+                    <div class="mt-2 pl-3 border-l-2 border-blue-500/30 space-y-2 animate-fade-in">
+                        ${extraAlts}
+                    </div>
+                </details>`;
+            }
+        } 
+        // Fallback for OLL/PLL which might still use the old single 'alt: "string"' format
+        else if (c.alt) {
+            altsHtml += `
+            <div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50">
+                <span class="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Alternative</span>
+                <p class="font-mono text-slate-300">${c.alt}</p>
+            </div>`;
+        }
+
+        // --- Construct the final Card HTML ---
         htmlContent += `
-        <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 cube-hover flex flex-col sm:flex-row items-center gap-6">
+        <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 cube-hover flex flex-col sm:flex-row items-start gap-6">
             <div class="flex-shrink-0 bg-slate-900 p-4 rounded-xl border border-slate-700 flex justify-center items-center h-36 w-36">
                 <img src="${imgUrl}" alt="${prefix} Case ${c.id}" class="w-full h-full object-contain">
             </div>
@@ -45,6 +93,9 @@ function generateCards(data, containerId, stageStr, viewStr, prefix) {
                         <span class="block text-xs text-emerald-400 font-bold mb-1 uppercase tracking-wider">Optimal Solution</span>
                         <p class="font-mono text-lg text-emerald-400 optimal-algo">${c.opt}</p>
                     </div>
+                    
+                    ${altsHtml}
+                    
                 </div>
             </div>
         </div>

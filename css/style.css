@@ -11,3 +11,27 @@
 .optimal-algo { 
     text-shadow: 0 0 8px rgba(34, 197, 94, 0.6); 
 }
+
+/* Smooth Accordion Animation */
+details[open] summary ~ * {
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Remove default marker from details (Safari/Chrome) */
+details > summary {
+    list-style: none;
+}
+details > summary::-webkit-details-marker {
+    display: none;
+}
