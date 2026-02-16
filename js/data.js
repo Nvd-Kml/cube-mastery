@@ -1,47 +1,62 @@
-// /js/data.js
-
 export const f2lCases = [
+    // Basic Inserts (1-4)
     { id: "1", cat: "Basic Inserts", opt: "U (R U' R')", alts: ["R' F R F'", "y' r' U' R U M'", "y U F' L F L2 U L"] },
     { id: "2", cat: "Basic Inserts", opt: "y' U' (R' U R)", alts: ["U' (R U R')", "F U F'", "y U L' U' L"] },
     { id: "3", cat: "Basic Inserts", opt: "y' (R' U' R)", alts: ["U' (R' U R)", "y L' U' L", "S U R U' R' S'"] },
     { id: "4", cat: "Basic Inserts", opt: "(R U R')", alts: ["y (L' U' L)", "y' f R f'", "y F U F'"] },
-    { id: "5", cat: "White Sticker Up", opt: "U' (R U2' R' U) y' (R' U' R)", alts: ["y' U (R' U2 R U') (R' U' R)", "U' (R U2' R') d (R' U' R)"] },
-    { id: "6", cat: "White Sticker Up", opt: "U (R U2' R' U) (R U' R')", alts: ["d (R' U2 R U') (R' U' R)", "y' U' (R' U2 R U) y (R U R')", "U (R U2 R') U (R U' R')"] },
-    { id: "7", cat: "White Sticker Up", opt: "U' (R U' R' U2) (R U' R')", alts: ["y' U (R' U' R U2) (R' U' R)", "U' (R U' R' U2) y' (R' U' R)", "d (R' U' R U2) (R' U' R)"] },
-    { id: "8", cat: "White Sticker Up", opt: "U (R U' R' U2) y' (R' U' R)", alts: ["d (R' U' R U2) (R' U' R)", "y' U' (R' U' R U2) y (R U R')", "U (R U' R' U2) (R U' R')"] },
-    { id: "9", cat: "White Sticker Up", opt: "y' U' (R' U2 R U') y (R U R')", alts: ["U' (R U2' R' U2) (R U R')", "y' U' (R' U2 R) U' y (R U R')", "d R' U2 R U' R U R'"] },
-    { id: "10", cat: "White Sticker Up", opt: "U (R U2' R' U2) (R U' R')", alts: ["U (R U' R' U') (R U' R' U) (R U' R')", "y L' U2 L U2 L' U L", "y' U R' U2 R U2 R' U R"] },
-    { id: "11", cat: "White Sticker Up", opt: "U' (R U R' U2) (R U' R')", alts: ["y' U' (R' U R U') (R' U R)", "U' (R U2' R' U2) (R U' R')", "d (R' U R U') (R' U R)"] },
-    { id: "12", cat: "White Sticker Up", opt: "U (R U' R' U) (R U' R' U) (R U' R')", alts: ["R U R' U2 R U' R' U R U' R'", "R U2' R' U' R U R' U' R U' R'", "R' D' R U2 R' D R2 U R'"] },
-    { id: "13", cat: "Different Colors Top", opt: "U' (R U' R' U) (R U R')", alts: ["(U' R U R') U2 (R U' R')", "U' R U2 R' U' R U2 R'", "M' U M U2 r U' r'"] },
-    { id: "14", cat: "Different Colors Top", opt: "U' (R U R' U) (R U R')", alts: ["y' U (R' U' R U') (R' U' R)", "U' (R U R' U) y' (R' U' R)", "d (R' U' R U') (R' U' R)"] },
-    { id: "15", cat: "Different Colors Top", opt: "y' U (R' U R U') (R' U' R)", alts: ["R U' R' U R U' R' U R U' R'", "y' U (R' U2 R U') y (R U R')", "d (R' U2 R U') (R U R')"] },
-    { id: "16", cat: "Different Colors Top", opt: "(R U' R' U) (R U' R')", alts: ["U' (R U' R' U2) (R U R')", "R U' R' U y' (R' U' R)", "y' R' U' R U' (R' U' R)"] },
-    { id: "17", cat: "Different Colors Top", opt: "U' (R U2' R' U) (R U R')", alts: ["y' U (R' U2 R U') (R' U' R)", "U' (R U2' R' U) y' (R' U' R)", "d (R' U2 R U') (R' U' R)"] },
-    { id: "18", cat: "Different Colors Top", opt: "y' U (R' U2 R U') (R' U' R)", alts: ["U (R U R' U2) (R U R')", "y' U (R' U2 R U') y (R U R')", "d (R' U2 R U') (R U R')"] },
-    { id: "19", cat: "Same Colors Top", opt: "y' U (R' U' R U2) (R' U R)", alts: ["U (R U R' U') d' (R' U R)", "y' U (R' U' R U2) y (R U R')", "d (R' U' R U2) (R U R')"] },
-    { id: "20", cat: "Same Colors Top", opt: "U' (R U R' U2) (R U' R')", alts: ["d (R' U' R U2) (R' U R)", "U' (R U R' U2) y' (R' U' R)", "y' U' (R' U' R U2) (R' U' R)"] },
-    { id: "21", cat: "Same Colors Top", opt: "U (R U' R' U') (R U R')", alts: ["y' U' (R' U R U) (R' U' R)", "U (R U' R' U') y' (R' U' R)", "d' (R' U R U) (R' U' R)"] },
-    { id: "22", cat: "Same Colors Top", opt: "y' U' (R' U R U) (R' U' R)", alts: ["U (R U' R' U') (R U R')", "y' U' (R' U R U) y (R U R')", "d (R U' R' U') (R U R')"] },
-    { id: "23", cat: "Same Colors Top", opt: "y' U (R' U R U') y (R U R')", alts: ["U' (R U' R' U2) (R U' R')", "y' U (R' U R U') (R' U' R)", "d (R U R' U') (R U R')"] },
-    { id: "24", cat: "Same Colors Top", opt: "U' (R U' R' U) y' (R' U' R)", alts: ["y' U (R' U' R U') (R' U' R)", "U' (R U' R' U) (R U' R')", "d (R' U' R U') (R' U' R)"] },
-    { id: "25", cat: "Corner Solved, Edge in U", opt: "U' F' (R U R' U') R' F R", alts: ["R' F' R U (R U' R') F", "y' U2 (R' U R U') (R' U R)", "d' (R' U R U') (R' U R)"] },
-    { id: "26", cat: "Corner Solved, Edge in U", opt: "U (R U' R' U') (R U' R' U) (R U' R')", alts: ["(R U R' U') F (R U R' U') F' (R U' R')", "R' F R U' R' F' R U (R U' R')", "U2 (R U' R' U') (R U' R')"] },
-    { id: "27", cat: "Edge Solved, Corner in U", opt: "(R U' R' U) (R U' R')", alts: ["y' (R' U' R U) (R' U' R)", "R U' R' U y' (R' U' R)", "F' U' F U2 (R U' R')"] },
-    { id: "28", cat: "Edge Solved, Corner in U", opt: "(R U R' U') (R U R')", alts: ["y' (R' U R U') (R' U' R)", "R U R' U' y' (R' U R)", "F U F' U2 (R' U R)"] },
-    { id: "29", cat: "Edge Solved, Corner in U", opt: "y' (R' U' R U) (R' U' R)", alts: ["U' (R' F R F') (R U' R')", "d' (R U R' U) (R U R')", "y L' U L U' L' U L"] },
-    { id: "30", cat: "Edge Solved, Corner in U", opt: "(U' R U' R') U2 (R U' R')", alts: ["(U' R U R') U y' (R' U' R)", "U F R' F' R2 U R'", "U2 F U F' R U R'"] },
-    { id: "31", cat: "Incorrectly Connected", opt: "y' (R' U R) U2' y (R U R')", alts: ["(R U R') U2 (R U' R' U) (R U' R')", "d' (R' U' R) U2 (R' U' R)", "U' R' F R F' R U' R'"] },
-    { id: "32", cat: "Incorrectly Connected", opt: "(R U' R' U2) y' (R' U' R)", alts: ["U F (R U R' U') F' (U R U' R')", "d (R U R') U2 (R U R')", "y' (R' U' R U2) y (R U R')"] },
-    { id: "33", cat: "Incorrectly Connected", opt: "(R U2 R') U' (R U R')", alts: ["y' (R' U2 R) U (R' U' R)", "y' (R' U' R) U' y (R U R')", "d' (R U2 R') U' (R U R')"] },
-    { id: "34", cat: "Incorrectly Connected", opt: "U (R U' R' U') (R U' R' U) (R U' R')", alts: ["(R U R' U2) (R U R' U') (R U R')", "y' (R' U R U2) (R' U R U) (R' U R)", "F (U R U' R') F' (R U' R')"] },
-    { id: "35", cat: "Incorrectly Connected", opt: "y' (R' U2 R) U (R' U' R)", alts: ["R U2 R' U' R U R'", "y' (R' U R) U y' (R' U R)", "d (R U2 R') U (R U R')"] },
-    { id: "36", cat: "Incorrectly Connected", opt: "y' (U' R' U R) U2 (R' U R)", alts: ["U (R U2 R') U (R U' R')", "y' U2 (R' U' R) U' y (R U R')", "d U (R U2 R') U (R U' R')"] },
-    { id: "37", cat: "Pieces in Slot", opt: "(R U' R' U') R U R' U2 (R U' R')", alts: ["(R U R' U') R U2 R' U' (R U R')", "R2 U2 F R2 F' U2 R' U R'", "R U2 R' U R U2 R' U F' U' F"] },
-    { id: "38", cat: "Pieces in Slot", opt: "(R U' R') d (R' U2 R) U2' (R' U R)", alts: ["(R U R' U') (R U' R') U2 y' (R' U' R)", "R U' R' U' R U R' U' R U2 R'", "R2 U2 R' U' R U' R' U2 R'"] },
-    { id: "39", cat: "Pieces in Slot", opt: "(R U R' U') (R U R')", alts: ["y' (R' U' R U) (R' U' R)", "R U R U2 R' U R U' R'", "R U2 R U R' U R U2 R2"] },
-    { id: "40", cat: "Pieces in Slot", opt: "(R U' R' U) (R U2' R') U (R U' R')", alts: ["(R U R') U2' (R U' R' U) (R U R')", "R U R' U' F' R U' R' U' R' F R", "r U r U2 r U r' R U R'"] },
-    { id: "41", cat: "Pieces in Slot", opt: "(R U' R') F (R U R' U') F' (R U' R')", alts: ["(R U R' U') R U' R' U2 y' R' U' R", "R U' R' U' r' U2 r U r", "R U' R' F' L' U2 L F"] },
+    
+    // Disconnected Pairs (5-10)
+    { id: "5", cat: "Disconnected Pairs", opt: "U' (R U2' R' U) y' (R' U' R)", alts: ["y' U (R' U2 R U') (R' U' R)", "U' (R U2' R') d (R' U' R)"] },
+    { id: "6", cat: "Disconnected Pairs", opt: "U (R U2' R' U) (R U' R')", alts: ["d (R' U2 R U') (R' U' R)", "y' U' (R' U2 R U) y (R U R')", "U (R U2 R') U (R U' R')"] },
+    { id: "7", cat: "Disconnected Pairs", opt: "U' (R U' R' U2) (R U' R')", alts: ["y' U (R' U' R U2) (R' U' R)", "U' (R U' R' U2) y' (R' U' R)", "d (R' U' R U2) (R' U' R)"] },
+    { id: "8", cat: "Disconnected Pairs", opt: "U (R U' R' U2) y' (R' U' R)", alts: ["d (R' U' R U2) (R' U' R)", "y' U' (R' U' R U2) y (R U R')", "U (R U' R' U2) (R U' R')"] },
+    { id: "9", cat: "Disconnected Pairs", opt: "y' U' (R' U2 R U') y (R U R')", alts: ["U' (R U2' R' U2) (R U R')", "y' U' (R' U2 R) U' y (R U R')", "d R' U2 R U' R U R'"] },
+    { id: "10", cat: "Disconnected Pairs", opt: "U (R U2' R' U2) (R U' R')", alts: ["U (R U' R' U') (R U' R' U) (R U' R')", "y L' U2 L U2 L' U L", "y' U R' U2 R U2 R' U R"] },
+    
+    // Connected Pairs (11-18)
+    { id: "11", cat: "Connected Pairs", opt: "U' (R U R' U2) (R U' R')", alts: ["y' U' (R' U R U') (R' U R)", "U' (R U2' R' U2) (R U' R')", "d (R' U R U') (R' U R)"] },
+    { id: "12", cat: "Connected Pairs", opt: "U (R U' R' U) (R U' R' U) (R U' R')", alts: ["R U R' U2 R U' R' U R U' R'", "R U2' R' U' R U R' U' R U' R'", "R' D' R U2 R' D R2 U R'"] },
+    { id: "13", cat: "Connected Pairs", opt: "U' (R U' R' U) (R U R')", alts: ["(U' R U R') U2 (R U' R')", "U' R U2 R' U' R U2 R'", "M' U M U2 r U' r'"] },
+    { id: "14", cat: "Connected Pairs", opt: "U' (R U R' U) (R U R')", alts: ["y' U (R' U' R U') (R' U' R)", "U' (R U R' U) y' (R' U' R)", "d (R' U' R U') (R' U' R)"] },
+    { id: "15", cat: "Connected Pairs", opt: "y' U (R' U R U') (R' U' R)", alts: ["R U' R' U R U' R' U R U' R'", "y' U (R' U2 R U') y (R U R')", "d (R' U2 R U') (R U R')"] },
+    { id: "16", cat: "Connected Pairs", opt: "(R U' R' U) (R U' R')", alts: ["U' (R U' R' U2) (R U R')", "R U' R' U y' (R' U' R)", "y' R' U' R U' (R' U' R)"] },
+    { id: "17", cat: "Connected Pairs", opt: "U' (R U2' R' U) (R U R')", alts: ["y' U (R' U2 R U') (R' U' R)", "U' (R U2' R' U) y' (R' U' R)", "d (R' U2 R U') (R' U' R)"] },
+    { id: "18", cat: "Connected Pairs", opt: "y' U (R' U2 R U') (R' U' R)", alts: ["U (R U R' U2) (R U R')", "y' U (R' U2 R U') y (R U R')", "d (R' U2 R U') (R U R')"] },
+    
+    // Disconnected Pairs (19-22)
+    { id: "19", cat: "Disconnected Pairs", opt: "y' U (R' U' R U2) (R' U R)", alts: ["U (R U R' U') d' (R' U R)", "y' U (R' U' R U2) y (R U R')", "d (R' U' R U2) (R U R')"] },
+    { id: "20", cat: "Disconnected Pairs", opt: "U' (R U R' U2) (R U' R')", alts: ["d (R' U' R U2) (R' U R)", "U' (R U R' U2) y' (R' U' R)", "y' U' (R' U' R U2) (R' U' R)"] },
+    { id: "21", cat: "Disconnected Pairs", opt: "U (R U' R' U') (R U R')", alts: ["y' U' (R' U R U) (R' U' R)", "U (R U' R' U') y' (R' U' R)", "d' (R' U R U) (R' U' R)"] },
+    { id: "22", cat: "Disconnected Pairs", opt: "y' U' (R' U R U) (R' U' R)", alts: ["U (R U' R' U') (R U R')", "y' U' (R' U R U) y (R U R')", "d (R U' R' U') (R U R')"] },
+    
+    // Connected Pairs (23-24)
+    { id: "23", cat: "Connected Pairs", opt: "y' U (R' U R U') y (R U R')", alts: ["U' (R U' R' U2) (R U' R')", "y' U (R' U R U') (R' U' R)", "d (R U R' U') (R U R')"] },
+    { id: "24", cat: "Connected Pairs", opt: "U' (R U' R' U) y' (R' U' R)", alts: ["y' U (R' U' R U') (R' U' R)", "U' (R U' R' U) (R U' R')", "d (R' U' R U') (R' U' R)"] },
+    
+    // Corner Solved, Edge in U (25-26)
+    { id: "25", cat: "Corner in Slot", opt: "U' F' (R U R' U') R' F R", alts: ["R' F' R U (R U' R') F", "y' U2 (R' U R U') (R' U R)", "d' (R' U R U') (R' U R)"] },
+    { id: "26", cat: "Corner in Slot", opt: "U (R U' R' U') (R U' R' U) (R U' R')", alts: ["(R U R' U') F (R U R' U') F' (R U' R')", "R' F R U' R' F' R U (R U' R')", "U2 (R U' R' U') (R U' R')"] },
+    
+    // Edge Solved, Corner in U (27-30)
+    { id: "27", cat: "Corner in Slot", opt: "(R U' R' U) (R U' R')", alts: ["y' (R' U' R U) (R' U' R)", "R U' R' U y' (R' U' R)", "F' U' F U2 (R U' R')"] },
+    { id: "28", cat: "Corner in Slot", opt: "(R U R' U') (R U R')", alts: ["y' (R' U R U') (R' U' R)", "R U R' U' y' (R' U R)", "F U F' U2 (R' U R)"] },
+    { id: "29", cat: "Corner in Slot", opt: "y' (R' U' R U) (R' U' R)", alts: ["U' (R' F R F') (R U' R')", "d' (R U R' U) (R U R')", "y L' U L U' L' U L"] },
+    { id: "30", cat: "Corner in Slot", opt: "(U' R U' R') U2 (R U' R')", alts: ["(U' R U R') U y' (R' U' R)", "U F R' F' R2 U R'", "U2 F U F' R U R'"] },
+    
+    // Incorrectly Connected / Edge in Slot (31-36)
+    { id: "31", cat: "Edge in Slot", opt: "y' (R' U R) U2' y (R U R')", alts: ["(R U R') U2 (R U' R' U) (R U' R')", "d' (R' U' R) U2 (R' U' R)", "U' R' F R F' R U' R'"] },
+    { id: "32", cat: "Edge in Slot", opt: "(R U' R' U2) y' (R' U' R)", alts: ["U F (R U R' U') F' (U R U' R')", "d (R U R') U2 (R U R')", "y' (R' U' R U2) y (R U R')"] },
+    { id: "33", cat: "Edge in Slot", opt: "(R U2 R') U' (R U R')", alts: ["y' (R' U2 R) U (R' U' R)", "y' (R' U' R) U' y (R U R')", "d' (R U2 R') U' (R U R')"] },
+    { id: "34", cat: "Edge in Slot", opt: "U (R U' R' U') (R U' R' U) (R U' R')", alts: ["(R U R' U2) (R U R' U') (R U R')", "y' (R' U R U2) (R' U R U) (R' U R)", "F (U R U' R') F' (R U' R')"] },
+    { id: "35", cat: "Edge in Slot", opt: "y' (R' U2 R) U (R' U' R)", alts: ["R U2 R' U' R U R'", "y' (R' U R) U y' (R' U R)", "d (R U2 R') U (R U R')"] },
+    { id: "36", cat: "Edge in Slot", opt: "y' (U' R' U R) U2 (R' U R)", alts: ["U (R U2 R') U (R U' R')", "y' U2 (R' U' R) U' y (R U R')", "d U (R U2 R') U (R U' R')"] },
+    
+    // Pieces in Slot (37-41)
+    { id: "37", cat: "Both in Slot", opt: "(R U' R' U') R U R' U2 (R U' R')", alts: ["(R U R' U') R U2 R' U' (R U R')", "R2 U2 F R2 F' U2 R' U R'", "R U2 R' U R U2 R' U F' U' F"] },
+    { id: "38", cat: "Both in Slot", opt: "(R U' R') d (R' U2 R) U2' (R' U R)", alts: ["(R U R' U') (R U' R') U2 y' (R' U' R)", "R U' R' U' R U R' U' R U2 R'", "R2 U2 R' U' R U' R' U2 R'"] },
+    { id: "39", cat: "Both in Slot", opt: "(R U R' U') (R U R')", alts: ["y' (R' U' R U) (R' U' R)", "R U R U2 R' U R U' R'", "R U2 R U R' U R U2 R2"] },
+    { id: "40", cat: "Both in Slot", opt: "(R U' R' U) (R U2' R') U (R U' R')", alts: ["(R U R') U2' (R U' R' U) (R U R')", "R U R' U' F' R U' R' U' R' F R", "r U r U2 r U r' R U R'"] },
+    { id: "41", cat: "Both in Slot", opt: "(R U' R') F (R U R' U') F' (R U' R')", alts: ["(R U R' U') R U' R' U2 y' R' U' R", "R U' R' U' r' U2 r U r", "R U' R' F' L' U2 L F"] },
 ];
 
 export const ollCases = [
