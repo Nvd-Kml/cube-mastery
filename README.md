@@ -2,6 +2,8 @@
 
 A modern, responsive, single-page algorithmic trainer and reference library for speedcubers. Designed to help you shave seconds off your PB by drilling F2L, OLL, and PLL cases with precision. Whether you are warming up on a standard 3x3 or dropping times on a MagLev Ball-Core setup, CubeMastery provides the perfect environment to practice your lookahead and muscle memory.
 
+Access it here: https://nvd-kml.github.io/cube-mastery/
+
 ![CubeMastery Demo](https://img.shields.io/badge/Status-Active-success) ![Vanilla JS](https://img.shields.io/badge/Javascript-Vanilla_ES6-yellow) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-blue)
 
 ## ✨ Features
