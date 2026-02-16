@@ -35,3 +35,23 @@ If you have Python installed, open your terminal, navigate to the project folder
 ```bash
 # Python 3
 python -m http.server 8000
+
+Then open your browser to http://localhost:8000.
+```
+
+## 📂 Project Structure
+
+```
+/cube-mastery
+│── index.html        # Main dashboard and UI layout
+├── /css
+│   └── style.css     # Custom animations and overrides
+└── /js
+    ├── data.js       # The database (F2L, OLL, PLL arrays & algorithms)
+    └── app.js        # The core logic (View router, rendering, and timer engine)
+```
+
+## 🙏 Credits & Acknowledgements
+- Algorithms: Optimal algorithms sourced from [CubeSkills](https://www.cubeskills.com/) by Feliks Zemdegs & Andy Klise. Alternative F2L algorithms curated from [SpeedCubeDB](https://www.speedcubedb.com/).
+- Visualizations: All cube imagery generated dynamically via the [WCA VisualCube API](https://visualcube.api.cubing.net/).
+- Google Gemini Pro for help in code changes.
