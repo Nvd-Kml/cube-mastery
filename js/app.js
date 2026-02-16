@@ -1,24 +1,17 @@
 import { f2lCases, ollCases, pllCases } from './data.js';
 
 // --- State Management ---
+let currentView = 'learn'; 
 let currentStage = 'F2L'; 
 let currentCategory = 'All';
 let searchQuery = '';
 
-// DOM Elements
-const container = document.getElementById('card-container');
-const filterPills = document.getElementById('filter-pills');
-const searchInput = document.getElementById('search-input');
-const resultsCount = document.getElementById('results-count');
-
-// Maps the stage string to the correct array and API parameters
 const stageConfig = {
     'F2L': { data: f2lCases, stageStr: 'f2l', viewStr: null, prefix: 'Case' },
     'OLL': { data: ollCases, stageStr: 'oll', viewStr: 'plan', prefix: 'OLL' },
     'PLL': { data: pllCases, stageStr: 'pll', viewStr: 'plan', prefix: 'PLL' }
 };
 
-// Math helper for Scrambles
 function getSetupScramble(alg) {
     let cleanAlg = alg.replace(/[()]/g, '');
     let moves = cleanAlg.trim().split(/\s+/);
@@ -31,27 +24,50 @@ function getSetupScramble(alg) {
     }).join(' ');
 }
 
-// Extract unique categories for the current stage
 function getCategories(data) {
     const categories = new Set(data.map(item => item.cat));
     return ['All', ...Array.from(categories)];
 }
 
-// Render the category pill buttons
+// ==========================================
+// VIEW ROUTER
+// ==========================================
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.nav-btn').forEach(b => {
+            b.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all';
+        });
+        const targetBtn = e.currentTarget;
+        targetBtn.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all bg-blue-600/10 text-blue-400 font-bold border border-blue-500/20';
+        
+        currentView = targetBtn.getAttribute('data-view');
+        document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+        document.getElementById(`view-${currentView}`).classList.remove('hidden');
+        
+        if (currentView === 'train' && timerState === 'IDLE') {
+            document.getElementById('train-active-panel').classList.add('hidden');
+            document.getElementById('train-setup-panel').classList.remove('hidden');
+            renderTrainerSetup();
+        }
+    });
+});
+
+// ==========================================
+// LEARN LIBRARY LOGIC
+// ==========================================
+const container = document.getElementById('card-container');
+const filterPills = document.getElementById('filter-pills');
+
 function renderFilters() {
     const config = stageConfig[currentStage];
     const categories = getCategories(config.data);
     
     filterPills.innerHTML = categories.map(cat => {
         const isActive = cat === currentCategory;
-        const baseClasses = "px-3 py-1 rounded-full text-sm font-semibold transition-all cursor-pointer border";
-        const activeClasses = isActive 
-            ? "bg-blue-600/20 border-blue-500 text-blue-400" 
-            : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-200";
-        return `<button class="filter-btn ${baseClasses} ${activeClasses}" data-cat="${cat}">${cat}</button>`;
+        const activeClasses = isActive ? "bg-blue-600/20 border-blue-500 text-blue-400" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700";
+        return `<button class="filter-btn px-3 py-1 rounded-full text-sm font-semibold transition-all cursor-pointer border ${activeClasses}" data-cat="${cat}">${cat}</button>`;
     }).join('');
 
-    // Attach click listeners to pills
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             currentCategory = e.target.getAttribute('data-cat');
@@ -60,128 +76,389 @@ function renderFilters() {
     });
 }
 
-// Render the algorithm cards based on current state
 function renderCards() {
     const config = stageConfig[currentStage];
-    
-    // 1. Filter by Category
     let filteredData = config.data;
-    if (currentCategory !== 'All') {
-        filteredData = filteredData.filter(c => c.cat === currentCategory);
-    }
-
-    // 2. Filter by Search Query (searches ID, Category, Optimal Alg, and Alternative Algs)
+    
+    if (currentCategory !== 'All') filteredData = filteredData.filter(c => c.cat === currentCategory);
     if (searchQuery) {
-        const q = searchQuery.toLowerCase().replace(/[()']/g, ''); // strip punctuation for easier searching
+        const q = searchQuery.toLowerCase().replace(/[()']/g, '');
         filteredData = filteredData.filter(c => {
             const searchString = `${c.id} ${c.cat} ${c.opt} ${c.alts ? c.alts.join(' ') : c.alt}`.toLowerCase().replace(/[()']/g, '');
             return searchString.includes(q);
         });
     }
 
-    resultsCount.textContent = `Showing ${filteredData.length} algorithms`;
+    document.getElementById('results-count').textContent = `Showing ${filteredData.length} algorithms`;
 
-    // 3. Build HTML
     container.innerHTML = filteredData.map(c => {
         const setupScramble = getSetupScramble(c.opt);
         const urlAlg = c.opt.replace(/[()]/g, '');
         let imgUrl = `https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=150&stage=${config.stageStr}&bg=t&sch=y,r,g,w,o,b&case=${encodeURIComponent(urlAlg)}`;
         if (config.viewStr) imgUrl += `&view=${config.viewStr}`;
 
-        // Alternatives Logic
         let altsHtml = '';
         if (c.alts && c.alts.length > 0) {
-            altsHtml += `
-            <div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50">
-                <span class="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Alternative 1</span>
-                <p class="font-mono text-slate-300">${c.alts[0]}</p>
-            </div>`;
-
+            altsHtml += `<div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative 1</span><p class="font-mono text-slate-300">${c.alts[0]}</p></div>`;
             if (c.alts.length > 1) {
-                let extraAlts = '';
-                for (let i = 1; i < c.alts.length; i++) {
-                    extraAlts += `
-                    <div class="p-3 mt-2 rounded-lg border border-slate-700 bg-slate-900/50">
-                        <span class="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Alternative ${i + 1}</span>
-                        <p class="font-mono text-slate-300">${c.alts[i]}</p>
-                    </div>`;
-                }
-                altsHtml += `
-                <details class="group mt-2">
-                    <summary class="cursor-pointer text-sm font-bold text-blue-400 hover:text-blue-300 flex items-center select-none transition-colors">
-                        <i class="fa-solid fa-chevron-right mr-2 transition-transform duration-200 group-open:rotate-90"></i>
-                        Show ${c.alts.length - 1} More Alternatives
-                    </summary>
-                    <div class="mt-2 pl-3 border-l-2 border-blue-500/30 space-y-2 animate-fade-in">
-                        ${extraAlts}
-                    </div>
-                </details>`;
+                let extraAlts = c.alts.slice(1).map((alt, i) => `<div class="p-3 mt-2 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative ${i + 2}</span><p class="font-mono text-slate-300">${alt}</p></div>`).join('');
+                altsHtml += `<details class="group mt-2"><summary class="cursor-pointer text-sm font-bold text-blue-400 hover:text-blue-300 flex items-center select-none"><i class="fa-solid fa-chevron-right mr-2 transition-transform duration-200 group-open:rotate-90"></i>Show ${c.alts.length - 1} More</summary><div class="mt-2 pl-3 border-l-2 border-blue-500/30 space-y-2 animate-fade-in">${extraAlts}</div></details>`;
             }
         } else if (c.alt) {
-            altsHtml += `
-            <div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50">
-                <span class="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Alternative</span>
-                <p class="font-mono text-slate-300">${c.alt}</p>
-            </div>`;
+            altsHtml += `<div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative</span><p class="font-mono text-slate-300">${c.alt}</p></div>`;
         }
 
         return `
         <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 cube-hover flex flex-col sm:flex-row items-start gap-6 animate-fade-in">
-            <div class="flex-shrink-0 bg-slate-900 p-4 rounded-xl border border-slate-700 flex justify-center items-center h-36 w-36">
-                <img src="${imgUrl}" alt="${config.prefix} Case ${c.id}" class="w-full h-full object-contain">
+            <div class="flex-shrink-0 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center gap-4 h-auto w-36">
+                <img src="${imgUrl}" alt="${config.prefix} Case ${c.id}" class="w-full h-auto object-contain">
+                <button class="train-this-btn w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2 rounded transition-colors" data-id="${c.id}" data-stage="${currentStage}">Train Case</button>
             </div>
             <div class="flex-grow w-full">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-xl font-bold">${config.prefix} ${c.id} <span class="text-sm font-normal text-slate-400 ml-2">${c.cat}</span></h3>
-                </div>
+                <div class="flex justify-between items-start mb-2"><h3 class="text-xl font-bold">${config.prefix} ${c.id} <span class="text-sm font-normal text-slate-400 ml-2">${c.cat}</span></h3></div>
                 <div class="space-y-3 mt-4">
-                    <div class="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10">
-                        <span class="block text-xs text-blue-400 font-bold mb-1 uppercase tracking-wider">Setup Scramble</span>
-                        <p class="font-mono text-sm text-blue-300">${setupScramble}</p>
-                    </div>
-                    <div class="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
-                        <span class="block text-xs text-emerald-400 font-bold mb-1 uppercase tracking-wider">Optimal Solution</span>
-                        <p class="font-mono text-lg text-emerald-400 optimal-algo">${c.opt}</p>
-                    </div>
+                    <div class="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10"><span class="block text-xs text-blue-400 font-bold mb-1">Setup Scramble</span><p class="font-mono text-sm text-blue-300">${setupScramble}</p></div>
+                    <div class="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10"><span class="block text-xs text-emerald-400 font-bold mb-1">Optimal Solution</span><p class="font-mono text-lg text-emerald-400 optimal-algo">${c.opt}</p></div>
                     ${altsHtml}
                 </div>
             </div>
-        </div>
-        `;
+        </div>`;
     }).join('');
+
+    document.querySelectorAll('.train-this-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = e.target.getAttribute('data-id');
+            const stage = e.target.getAttribute('data-stage');
+            trainSpecificCase(stage, id);
+        });
+    });
 }
 
-// Master function to sync UI with State
+document.querySelectorAll('.stage-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.stage-tab').forEach(t => t.className = 'stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white');
+        e.target.className = 'stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg';
+        currentStage = e.target.id.replace('tab-', '').toUpperCase();
+        currentCategory = 'All';
+        renderApp();
+    });
+});
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    renderCards();
+});
+
 function renderApp() {
     renderFilters();
     renderCards();
 }
 
-// --- Event Listeners ---
+// ==========================================
+// TRAINER SETUP & ENGINE
+// ==========================================
+let trainSelectedStage = 'F2L';
+let trainCurrentCategory = 'All';
+let selectedTrainCases = new Set(); // Stores checked cases in memory!
 
-// Main Tabs Logic
-document.querySelectorAll('.stage-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-        // Reset styles for all tabs
-        document.querySelectorAll('.stage-tab').forEach(t => {
-            t.className = 'stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white';
+let trainQueue = [];
+let currentTrainIndex = 0;
+
+function updateSelectionCount() {
+    document.getElementById('train-selection-count').textContent = `${selectedTrainCases.size} Cases Selected`;
+}
+
+function renderTrainFilters() {
+    const config = stageConfig[trainSelectedStage];
+    const categories = getCategories(config.data);
+    
+    document.getElementById('train-filter-pills').innerHTML = categories.map(cat => {
+        const isActive = cat === trainCurrentCategory;
+        const activeClasses = isActive ? "bg-blue-600/20 border-blue-500 text-blue-400" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700";
+        return `<button class="train-filter-btn px-3 py-1 rounded-full text-sm font-semibold transition-all cursor-pointer border ${activeClasses}" data-cat="${cat}">${cat}</button>`;
+    }).join('');
+
+    document.querySelectorAll('.train-filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            trainCurrentCategory = e.target.getAttribute('data-cat');
+            renderTrainerSetup();
         });
+    });
+}
+
+function renderTrainerSetup() {
+    renderTrainFilters();
+    
+    const config = stageConfig[trainSelectedStage];
+    let displayCategories = getCategories(config.data).filter(cat => cat !== 'All');
+    
+    // Filter view if a specific pill is selected
+    if (trainCurrentCategory !== 'All') {
+        displayCategories = [trainCurrentCategory];
+    }
+    
+    let html = '';
+    displayCategories.forEach(cat => {
+        const catCases = config.data.filter(c => c.cat === cat);
+        const allChecked = catCases.every(c => selectedTrainCases.has(c.id));
         
-        // Add active style to clicked tab
-        e.target.className = 'stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg';
+        html += `
+        <div class="mb-8 animate-fade-in">
+            <div class="flex items-center mb-4">
+                <input type="checkbox" id="cat-${cat.replace(/\s+/g, '-')}" class="cat-checkbox w-5 h-5 text-blue-600 bg-slate-900 border-slate-600 rounded focus:ring-blue-500" data-cat="${cat}" ${allChecked ? 'checked' : ''}>
+                <label for="cat-${cat.replace(/\s+/g, '-')}" class="ml-3 text-xl font-bold text-white cursor-pointer select-none">${cat}</label>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 pl-8">
+        `;
         
-        // Update State and Re-render
-        currentStage = e.target.id.replace('tab-', '').toUpperCase();
-        currentCategory = 'All'; // Reset category when switching stages
-        renderApp();
+        catCases.forEach(c => {
+            const isChecked = selectedTrainCases.has(c.id);
+            const urlAlg = c.opt.replace(/[()]/g, '');
+            let imgUrl = `https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=80&stage=${config.stageStr}&bg=t&sch=y,r,g,w,o,b&case=${encodeURIComponent(urlAlg)}`;
+            if (config.viewStr) imgUrl += `&view=${config.viewStr}`;
+
+            html += `
+                <label class="relative flex flex-col items-center p-3 border-2 border-slate-700 bg-slate-800/50 rounded-xl cursor-pointer hover:bg-slate-700 transition-colors ${isChecked ? 'border-blue-500 bg-blue-600/20' : ''}">
+                    <div class="absolute top-2 left-2">
+                        <input type="checkbox" class="case-checkbox w-4 h-4 text-blue-600 bg-slate-900 border-slate-600 rounded focus:ring-blue-500" value="${c.id}" data-cat="${cat}" ${isChecked ? 'checked' : ''}>
+                    </div>
+                    <img src="${imgUrl}" class="w-16 h-16 mb-2 pointer-events-none" />
+                    <span class="text-sm font-bold text-slate-300 pointer-events-none">${config.prefix} ${c.id}</span>
+                </label>
+            `;
+        });
+        html += `</div></div>`;
+    });
+    
+    document.getElementById('trainer-case-list').innerHTML = html;
+    
+    // Wire up Checkboxes to state memory
+    document.querySelectorAll('.case-checkbox').forEach(box => {
+        box.addEventListener('change', (e) => {
+            if (e.target.checked) selectedTrainCases.add(e.target.value);
+            else selectedTrainCases.delete(e.target.value);
+            
+            // Re-render to update the blue borders
+            renderTrainerSetup();
+            updateSelectionCount();
+        });
+    });
+    
+    document.querySelectorAll('.cat-checkbox').forEach(catBox => {
+        catBox.addEventListener('change', (e) => {
+            const catName = e.target.getAttribute('data-cat');
+            const catCases = config.data.filter(c => c.cat === catName);
+            
+            catCases.forEach(c => {
+                if (e.target.checked) selectedTrainCases.add(c.id);
+                else selectedTrainCases.delete(c.id);
+            });
+            renderTrainerSetup();
+            updateSelectionCount();
+        });
+    });
+    
+    updateSelectionCount();
+}
+
+// Stage Tabs in Trainer Setup
+document.querySelectorAll('.train-stage-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.train-stage-tab').forEach(t => t.className = 'train-stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white');
+        e.target.className = 'train-stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg';
+        trainSelectedStage = e.target.getAttribute('data-stage');
+        trainCurrentCategory = 'All'; // Reset filter when changing stage
+        selectedTrainCases.clear(); // Clear selections when changing stage
+        renderTrainerSetup();
     });
 });
 
-// Search Logic
-searchInput.addEventListener('input', (e) => {
-    searchQuery = e.target.value;
-    renderCards(); // Only need to re-render cards, not the filter pills
+// Select All / Clear All Buttons (Only affects the current filtered view)
+document.getElementById('btn-select-all').addEventListener('click', () => {
+    const config = stageConfig[trainSelectedStage];
+    let targetCases = config.data;
+    if (trainCurrentCategory !== 'All') {
+        targetCases = targetCases.filter(c => c.cat === trainCurrentCategory);
+    }
+    targetCases.forEach(c => selectedTrainCases.add(c.id));
+    renderTrainerSetup();
+});
+
+document.getElementById('btn-deselect-all').addEventListener('click', () => {
+    const config = stageConfig[trainSelectedStage];
+    let targetCases = config.data;
+    if (trainCurrentCategory !== 'All') {
+        targetCases = targetCases.filter(c => c.cat === trainCurrentCategory);
+    }
+    targetCases.forEach(c => selectedTrainCases.delete(c.id));
+    renderTrainerSetup();
+});
+
+// ==========================================
+// TIMER EXECUTION & TRAINER ENGINE
+// ==========================================
+let timerState = 'IDLE'; 
+let startTime = 0;
+let timerInterval = null;
+
+// DOM Elements for Trainer
+const timerDisplay = document.getElementById('timer-display');
+const scrambleDisplay = document.getElementById('train-scramble');
+const imageDisplay = document.getElementById('train-image');
+const placeholderDisplay = document.getElementById('train-placeholder');
+const manualNextBtn = document.getElementById('manual-next-btn');
+const autoNextToggle = document.getElementById('auto-next-toggle');
+
+// New DOM Elements for Hint Feature
+const showSolutionToggle = document.getElementById('show-solution-toggle');
+const solutionContainer = document.getElementById('train-solution-container');
+const solutionText = document.getElementById('train-solution');
+
+// Listen for the hint toggle to instantly show/hide the solution
+showSolutionToggle.addEventListener('change', () => {
+    if (trainQueue.length > 0 && currentTrainIndex < trainQueue.length) {
+        solutionContainer.classList.toggle('hidden', !showSolutionToggle.checked);
+    }
+});
+
+document.getElementById('start-selected-btn').addEventListener('click', () => {
+    if (selectedTrainCases.size === 0) {
+        alert("Please select at least one case to train!");
+        return;
+    }
+    
+    const config = stageConfig[trainSelectedStage];
+    trainQueue = config.data.filter(c => selectedTrainCases.has(c.id));
+    // Randomize the drill order so you train lookahead, not memory
+    trainQueue.sort(() => Math.random() - 0.5); 
+    currentTrainIndex = 0;
+    
+    document.getElementById('train-setup-panel').classList.add('hidden');
+    document.getElementById('train-active-panel').classList.remove('hidden');
+    
+    loadActiveTrainCase();
+});
+
+function trainSpecificCase(stage, id) {
+    const config = stageConfig[stage];
+    const specificCase = config.data.find(c => c.id === id);
+    if (specificCase) {
+        trainQueue = [specificCase];
+        currentTrainIndex = 0;
+        trainSelectedStage = stage;
+        
+        document.querySelector('[data-view="train"]').click();
+        document.getElementById('train-setup-panel').classList.add('hidden');
+        document.getElementById('train-active-panel').classList.remove('hidden');
+        
+        loadActiveTrainCase();
+    }
+}
+
+function loadActiveTrainCase() {
+    if (trainQueue.length === 0) return;
+    if (currentTrainIndex >= trainQueue.length) {
+        scrambleDisplay.textContent = "Session Complete!";
+        solutionContainer.classList.add('hidden'); // Hide hint when done
+        imageDisplay.classList.add('hidden');
+        placeholderDisplay.classList.remove('hidden');
+        timerDisplay.textContent = "0.00";
+        document.getElementById('train-queue-counter').textContent = "Done";
+        return;
+    }
+
+    const c = trainQueue[currentTrainIndex];
+    const config = stageConfig[trainSelectedStage];
+    
+    // Update Text Data
+    document.getElementById('train-queue-counter').textContent = `Case ${currentTrainIndex + 1} / ${trainQueue.length}`;
+    scrambleDisplay.textContent = getSetupScramble(c.opt);
+    
+    // Inject Solution text and respect the current toggle state
+    solutionText.textContent = c.opt;
+    solutionContainer.classList.toggle('hidden', !showSolutionToggle.checked);
+
+    // Update Image
+    const urlAlg = c.opt.replace(/[()]/g, '');
+    let imgUrl = `https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=300&stage=${config.stageStr}&bg=t&sch=y,r,g,w,o,b&case=${encodeURIComponent(urlAlg)}`;
+    if (config.viewStr) imgUrl += `&view=${config.viewStr}`;
+    
+    imageDisplay.src = imgUrl;
+    imageDisplay.classList.remove('hidden');
+    placeholderDisplay.classList.add('hidden');
+
+    // Reset Timer
+    timerDisplay.textContent = "0.00";
+    timerDisplay.style.color = "white";
+    timerState = 'IDLE';
+
+    manualNextBtn.classList.toggle('hidden', autoNextToggle.checked);
+}
+
+document.getElementById('stop-session-btn').addEventListener('click', () => {
+    timerState = 'IDLE';
+    clearInterval(timerInterval);
+    document.getElementById('train-active-panel').classList.add('hidden');
+    document.getElementById('train-setup-panel').classList.remove('hidden');
+});
+
+function formatTime(ms) {
+    return (ms / 1000).toFixed(2);
+}
+
+function updateTimer() {
+    timerDisplay.textContent = formatTime(Date.now() - startTime);
+}
+
+window.addEventListener('keydown', (e) => {
+    if (document.getElementById('train-active-panel').classList.contains('hidden')) return;
+    if (currentView !== 'train' || trainQueue.length === 0) return;
+    
+    if (e.code === 'Space') {
+        e.preventDefault(); 
+        if (timerState === 'IDLE' || timerState === 'STOPPED') {
+            timerState = 'READY';
+            timerDisplay.style.color = '#22c55e'; // Green
+        } 
+        else if (timerState === 'RUNNING') {
+            timerState = 'STOPPED';
+            clearInterval(timerInterval);
+            updateTimer();
+            
+            if (autoNextToggle.checked && currentTrainIndex < trainQueue.length) {
+                setTimeout(() => {
+                    currentTrainIndex++;
+                    loadActiveTrainCase();
+                }, 1000); 
+            } else if (currentTrainIndex < trainQueue.length) {
+                manualNextBtn.classList.remove('hidden');
+            }
+        }
+    }
+});
+
+window.addEventListener('keyup', (e) => {
+    if (e.code === 'Space' && timerState === 'READY') {
+        timerState = 'RUNNING';
+        timerDisplay.style.color = 'white';
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 10);
+    }
+});
+
+manualNextBtn.addEventListener('click', () => {
+    currentTrainIndex++;
+    loadActiveTrainCase();
+});
+
+autoNextToggle.addEventListener('change', () => {
+    if (timerState === 'STOPPED') {
+        manualNextBtn.classList.toggle('hidden', autoNextToggle.checked);
+    }
 });
 
 // Initial Load
-document.addEventListener('DOMContentLoaded', renderApp);
+document.addEventListener('DOMContentLoaded', () => {
+    renderApp();
+    renderTrainerSetup();
+});

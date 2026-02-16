@@ -4,45 +4,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CubeMastery | Algorithmic Trainer</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <link href="css/style.css" rel="stylesheet">
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-blue-500 selection:text-white pb-20">
+<body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-blue-500 selection:text-white flex h-screen overflow-hidden">
 
-    <nav class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 pt-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4">
-                <div class="flex-shrink-0 font-bold text-3xl tracking-tighter text-blue-500">
-                    Cube<span class="text-white">Mastery</span>
-                </div>
-                
-                <div class="flex bg-slate-800 p-1 rounded-lg border border-slate-700">
+    <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col h-full z-20 shadow-2xl relative">
+        <div class="p-6 border-b border-slate-800">
+            <div class="font-bold text-3xl tracking-tighter text-blue-500">
+                Cube<span class="text-white">Mastery</span>
+            </div>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-4 pl-3">Library</div>
+            <button class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all bg-blue-600/10 text-blue-400 font-bold border border-blue-500/20" data-view="learn">
+                <i class="fa-solid fa-book-open w-5"></i> Learn Cases
+            </button>
+            
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-8 pl-3">Practice</div>
+            <button class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all" data-view="train">
+                <i class="fa-solid fa-stopwatch w-5"></i> Trainer
+            </button>
+        </nav>
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-600 font-mono text-center">
+            RS3M v5 Ready
+        </div>
+    </aside>
+
+    <main class="flex-1 h-full overflow-y-auto relative bg-slate-900 flex flex-col">
+        
+        <section id="view-learn" class="view-section w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 block">
+            
+            <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur border-b border-slate-800 pb-4 mb-8 pt-4">
+                <div class="flex bg-slate-800 p-1 rounded-lg border border-slate-700 w-fit mb-4">
                     <button id="tab-f2l" class="stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg">F2L</button>
                     <button id="tab-oll" class="stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white">OLL</button>
                     <button id="tab-pll" class="stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white">PLL</button>
                 </div>
-            </div>
-
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 py-4 border-t border-slate-800">
                 
-                <div id="filter-pills" class="flex flex-wrap gap-2"></div>
-                
-                <div class="relative w-full md:w-64">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-search text-slate-500"></i>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div id="filter-pills" class="flex flex-wrap gap-2"></div>
+                    <div class="relative w-full md:w-64">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-search text-slate-500"></i>
+                        </div>
+                        <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-slate-700 rounded-lg leading-5 bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500 sm:text-sm transition-colors" placeholder="Search algorithms...">
                     </div>
-                    <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-slate-700 rounded-lg leading-5 bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors" placeholder="Search algorithms...">
                 </div>
             </div>
-        </div>
-    </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        <p id="results-count" class="text-slate-400 mb-6 font-mono text-sm"></p>
-        
-        <div id="card-container" class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <p id="results-count" class="text-slate-400 mb-6 font-mono text-sm"></p>
+            <div id="card-container" class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start pb-20"></div>
+        </section>
+
+        <section id="view-train" class="view-section w-full h-full flex flex-col hidden overflow-hidden">
+            
+            <div id="train-setup-panel" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col pb-24 animate-fade-in max-w-7xl mx-auto w-full">
+                
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-6 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-2">Trainer Setup</h2>
+                        <p class="text-slate-400">Select the specific cases you want to drill. The queue will be shuffled randomly.</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-4">
+                        <div class="flex bg-slate-800 p-1 rounded-lg border border-slate-700">
+                            <button id="train-tab-f2l" class="train-stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg" data-stage="F2L">F2L</button>
+                            <button id="train-tab-oll" class="train-stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white" data-stage="OLL">OLL</button>
+                            <button id="train-tab-pll" class="train-stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white" data-stage="PLL">PLL</button>
+                        </div>
+                        <button id="start-selected-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-8 rounded-lg shadow-lg shadow-emerald-500/20 transition-all text-lg">
+                            Start Session <i class="fa-solid fa-play ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="train-filter-pills" class="flex flex-wrap gap-2 mb-6"></div>
+
+                <div class="flex gap-2 mb-6">
+                    <button id="btn-select-all" class="text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg border border-slate-700 transition-colors">
+                        <i class="fa-solid fa-check-double mr-2"></i>Select Displayed
+                    </button>
+                    <button id="btn-deselect-all" class="text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg border border-slate-700 transition-colors">
+                        <i class="fa-solid fa-eraser mr-2"></i>Clear Displayed
+                    </button>
+                    <span id="train-selection-count" class="ml-auto text-sm font-bold text-blue-400 flex items-center">
+                        0 Cases Selected
+                    </span>
+                </div>
+
+                <div id="trainer-case-list" class="flex-1"></div>
             </div>
+
+            <div id="train-active-panel" class="flex-1 flex flex-col hidden relative animate-fade-in">
+                
+                <div class="bg-slate-950 border-b border-slate-800 p-4 flex justify-between items-center z-10">
+                    <button id="stop-session-btn" class="text-slate-400 hover:text-white flex items-center font-bold transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Back to Setup
+                    </button>
+                    
+                    <div class="flex items-center gap-6">
+                        
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="show-solution-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                            <span class="ml-3 text-sm font-medium text-slate-300">Show Hint</span>
+                        </label>
+
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="auto-next-toggle" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            <span class="ml-3 text-sm font-medium text-slate-300">Auto-Next</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center relative p-8">
+                    
+                    <div class="absolute top-8 left-8 text-slate-500 font-mono text-lg font-bold" id="train-queue-counter">
+                        0 / 0 Cases
+                    </div>
+
+                    <div class="text-center mb-8 h-32 flex flex-col justify-center items-center">
+                        <p class="text-slate-400 font-bold tracking-widest uppercase mb-2 text-sm">Setup Scramble</p>
+                        <h2 id="train-scramble" class="text-3xl md:text-5xl font-mono text-blue-400 max-w-4xl leading-tight">
+                            Loading...
+                        </h2>
+                        
+                        <div id="train-solution-container" class="mt-4 hidden animate-fade-in flex flex-col items-center">
+                            <p class="text-slate-500 font-bold tracking-widest uppercase mb-1 text-xs">Optimal Solution</p>
+                            <p id="train-solution" class="text-2xl font-mono text-emerald-400 optimal-algo"></p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 mb-8 shadow-2xl h-48 w-48 flex items-center justify-center">
+                        <img id="train-image" src="" alt="Trainer Cube" class="w-full h-full object-contain hidden">
+                        <i id="train-placeholder" class="fa-solid fa-cube text-6xl text-slate-600"></i>
+                    </div>
+
+                    <div id="timer-display" class="text-7xl md:text-[10rem] font-mono font-bold tracking-tighter text-white transition-colors duration-150 select-none">
+                        0.00
+                    </div>
+                    <p class="text-slate-500 mt-4 font-bold"><i class="fa-solid fa-keyboard mr-2"></i> Hold SPACE to ready, release to start.</p>
+                    
+                    <button id="manual-next-btn" class="mt-8 px-8 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg font-bold text-white transition-colors hidden">
+                        Next Case <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script type="module" src="js/app.js"></script>
