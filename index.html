@@ -161,7 +161,7 @@
                         </div>
 
                         <div class="text-center mb-6 h-auto min-h-[6rem] flex flex-col justify-center items-center mt-8">
-                            <p class="text-slate-400 font-bold tracking-widest uppercase mb-2 text-xs md:text-sm">Setup Scramble</p>
+                            <p class="text-slate-400 font-bold tracking-widest uppercase mb-2 text-xs md:text-sm" id="train-scramble-title">Setup Scramble</p>
                             <h2 id="train-scramble" class="text-2xl sm:text-3xl md:text-5xl font-mono text-blue-400 max-w-4xl leading-tight">Loading...</h2>
                             <div id="train-solution-container" class="mt-4 hidden animate-fade-in flex flex-col items-center">
                                 <p class="text-slate-500 font-bold tracking-widest uppercase mb-1 text-[10px] md:text-xs">Optimal Solution</p>
@@ -169,16 +169,18 @@
                             </div>
                         </div>
 
-                        <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-6 shadow-2xl h-32 w-32 md:h-48 md:w-48 flex items-center justify-center pointer-events-none">
+                        <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-6 shadow-2xl h-32 w-32 md:h-48 md:w-48 flex items-center justify-center pointer-events-none relative">
                             <img id="train-image" src="" alt="Trainer Cube" class="w-full h-full object-contain hidden pointer-events-none">
                             <i id="train-placeholder" class="fa-solid fa-cube text-4xl md:text-6xl text-slate-600 pointer-events-none"></i>
+                            
+                            <i id="train-success-icon" class="fa-solid fa-circle-check text-6xl md:text-8xl text-emerald-500 hidden pointer-events-none absolute drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]"></i>
                         </div>
 
                         <div id="timer-display" class="text-6xl sm:text-7xl md:text-9xl lg:text-[10rem] font-mono font-bold tracking-tighter text-white transition-colors duration-150 select-none pointer-events-none">
                             0.00
                         </div>
                         
-                        <p class="text-slate-500 mt-4 font-bold text-center text-sm md:text-base pointer-events-none">
+                        <p id="timer-instruction" class="text-slate-500 mt-4 font-bold text-center text-sm md:text-base pointer-events-none">
                             <i class="fa-solid fa-hand-pointer mr-2 md:hidden"></i>
                             <i class="fa-solid fa-keyboard mr-2 hidden md:inline"></i>
                             Hold Space or Touch Screen to ready.
@@ -192,6 +194,10 @@
                                 Skip / Next <i class="fa-solid fa-arrow-right ml-2"></i>
                             </button>
                         </div>
+
+                        <button id="retry-session-btn" class="mt-4 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 border border-emerald-500 rounded-xl font-bold text-white transition-all shadow-lg shadow-emerald-500/20 text-lg hidden z-20 flex items-center justify-center w-full max-w-sm">
+                            <i class="fa-solid fa-rotate-right mr-3"></i> Retry Session
+                        </button>
 
                     </div>
                 </div>

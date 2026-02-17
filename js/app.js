@@ -352,6 +352,10 @@ const trainActivePanel = document.getElementById('train-active-panel');
 const trainNavButtons = document.getElementById('train-nav-buttons');
 const prevCaseBtn = document.getElementById('prev-case-btn');
 const nextCaseBtn = document.getElementById('next-case-btn');
+const timerInstruction = document.getElementById('timer-instruction');
+const trainSuccessIcon = document.getElementById('train-success-icon');
+const retrySessionBtn = document.getElementById('retry-session-btn');
+const trainScrambleTitle = document.getElementById('train-scramble-title');
 
 showSolutionToggle.addEventListener('change', () => {
     if (trainQueue.length > 0 && currentTrainIndex < trainQueue.length) {
@@ -402,17 +406,27 @@ function loadActiveTrainCase() {
     // Check if session is complete
     if (currentTrainIndex >= trainQueue.length) {
         scrambleDisplay.textContent = "Session Complete!";
+        trainScrambleTitle.classList.add('hidden'); // Hide the "Setup Scramble" text
         solutionContainer.classList.add('hidden'); 
         trainPbDisplay.classList.add('hidden');
         imageDisplay.classList.add('hidden');
-        placeholderDisplay.classList.remove('hidden');
-        trainNavButtons.classList.add('hidden'); // Hide Skip/Prev on complete
-        timerDisplay.textContent = "0.00";
+        placeholderDisplay.classList.add('hidden'); // Hide the empty cube
+        trainSuccessIcon.classList.remove('hidden'); // Show the green checkmark
+        trainNavButtons.classList.add('hidden'); 
+        timerDisplay.classList.add('hidden'); // Hide the timer
+        timerInstruction.classList.add('hidden'); // Hide the spacebar instruction
+        retrySessionBtn.classList.remove('hidden'); // Show Retry Button
+        
         document.getElementById('train-queue-counter').textContent = "Done";
         return;
     }
 
     // Initialize UI for Active Case
+    trainScrambleTitle.classList.remove('hidden');
+    timerDisplay.classList.remove('hidden');
+    timerInstruction.classList.remove('hidden');
+    trainSuccessIcon.classList.add('hidden');
+    retrySessionBtn.classList.add('hidden');
     trainNavButtons.classList.remove('hidden');
     prevCaseBtn.disabled = currentTrainIndex === 0;
 
@@ -525,6 +539,13 @@ nextCaseBtn.addEventListener('click', () => {
     clearInterval(timerInterval);
     timerState = 'IDLE';
     currentTrainIndex++;
+    loadActiveTrainCase();
+});
+
+// --- RETRY SESSION LISTENER ---
+retrySessionBtn.addEventListener('click', () => {
+    trainQueue.sort(() => Math.random() - 0.5); 
+    currentTrainIndex = 0;
     loadActiveTrainCase();
 });
 
