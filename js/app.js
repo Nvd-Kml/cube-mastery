@@ -82,28 +82,37 @@ const mobileActive = 'nav-btn mobile-nav flex-1 flex flex-col items-center p-2 r
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-        currentView = e.currentTarget.getAttribute('data-view');
-
+        const targetView = e.currentTarget.getAttribute('data-view');
+        
+        // 1. Safely reset ALL desktop buttons to the transparent border state
         document.querySelectorAll('.desktop-nav').forEach(b => {
-            b.className = b.getAttribute('data-view') === currentView ? desktopActive : desktopInactive;
+            b.className = "nav-btn desktop-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all border border-transparent focus:outline-none focus:ring-0";
         });
-        
-        document.querySelectorAll('.mobile-nav').forEach(b => {
-            b.className = b.getAttribute('data-view') === currentView ? mobileActive : mobileInactive;
-        });
-        
-        document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
-        document.getElementById(`view-${currentView}`).classList.remove('hidden');
-        
-        if (currentView === 'train' && timerState === 'IDLE') {
-            document.getElementById('train-active-panel').classList.add('hidden');
-            document.getElementById('train-setup-panel').classList.remove('hidden');
-            renderTrainerSetup();
-        } else if (currentView === 'learn') {
-            renderCards(); 
-        } else if (currentView === 'stats') {
-            renderStats(); // Update dashboard when clicked
+
+        // 2. Safely apply the active classes to the clicked desktop button
+        const activeDesktop = document.querySelector(`.desktop-nav[data-view="${targetView}"]`);
+        if (activeDesktop) {
+            activeDesktop.className = "nav-btn desktop-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all bg-blue-600/10 text-blue-400 font-bold border border-blue-500/20 focus:outline-none focus:ring-0";
         }
+
+        // 3. Update Mobile nav styling (reset all, then highlight active)
+        document.querySelectorAll('.mobile-nav').forEach(b => {
+            b.classList.remove('text-blue-400');
+            b.classList.add('text-slate-500');
+        });
+        const activeMobile = document.querySelector(`.mobile-nav[data-view="${targetView}"]`);
+        if (activeMobile) {
+            activeMobile.classList.remove('text-slate-500');
+            activeMobile.classList.add('text-blue-400');
+        }
+
+        // 4. Switch the actual visible sections
+        document.querySelectorAll('.view-section').forEach(section => {
+            section.classList.add('hidden');
+            section.classList.remove('block'); // Remove block just in case
+        });
+        document.getElementById(`view-${targetView}`).classList.remove('hidden');
+        document.getElementById(`view-${targetView}`).classList.add('block'); // Force display
     });
 });
 

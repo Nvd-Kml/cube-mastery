@@ -1,3 +1,13 @@
+/* Remove default browser focus outlines and mobile tap highlights */
+button {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+button:focus {
+    outline: none !important;
+}
+
 /* Custom Animations and Overrides */
 .cube-hover { 
     transition: transform 0.3s ease, box-shadow 0.3s ease; 
