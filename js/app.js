@@ -433,12 +433,20 @@ function updateTimer() {
 }
 
 function handleTimerDown(e) {
-    if (e.target.closest('button') || e.target.closest('label') || e.target.tagName === 'INPUT') return;
+    // 1. Ensure we are actually in an active training session
     if (trainActivePanel.classList.contains('hidden') || currentView !== 'train' || trainQueue.length === 0) return;
     
-    if (e.type === 'keydown' && e.code !== 'Space') return;
-    if (e.type === 'keydown') e.preventDefault();
+    // 2. Handle Keyboard vs Touch differently
+    if (e.type === 'keydown') {
+        if (e.code !== 'Space') return; // Ignore all keys except Space
+        e.preventDefault(); // Stop the browser from scrolling or clicking focused buttons
+        if (document.activeElement) document.activeElement.blur(); // Force focus away from any toggles/buttons
+    } else {
+        // It's a Touch event: Ignore if the user is explicitly tapping a UI button or toggle
+        if (e.target.closest('button') || e.target.closest('label') || e.target.tagName === 'INPUT') return;
+    }
     
+    // 3. Timer State Logic
     if (timerState === 'IDLE' || timerState === 'STOPPED') {
         timerState = 'READY';
         timerDisplay.style.color = '#22c55e'; 
@@ -465,7 +473,11 @@ function handleTimerDown(e) {
 }
 
 function handleTimerUp(e) {
-    if (e.type === 'keyup' && e.code !== 'Space') return;
+    if (e.type === 'keyup') {
+        if (e.code !== 'Space') return;
+        e.preventDefault();
+    }
+    
     if (timerState === 'READY') {
         timerState = 'RUNNING';
         timerDisplay.style.color = 'white';
