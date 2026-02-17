@@ -237,13 +237,18 @@ function renderTrainerSetup() {
     const config = stageConfig[trainSelectedStage];
     let displayCategories = getCategories(config.data).filter(cat => cat !== 'All');
     if (trainCurrentCategory !== 'All') displayCategories = [trainCurrentCategory];
+
+    const masterWrapper = document.getElementById('master-checkbox-wrapper');
+    if (masterWrapper) {
+        masterWrapper.classList.toggle('hidden', trainCurrentCategory !== 'All');
+    }
     
     let html = '';
     displayCategories.forEach(cat => {
         const catCases = config.data.filter(c => c.cat === cat);
         const allChecked = catCases.every(c => selectedTrainCases.has(c.id));
         
-        // Category Header & Checkbox (Now with animated inner square)
+        // Category Header & Checkbox
         html += `
         <div class="mb-8 animate-fade-in">
             <label class="flex items-center mb-4 cursor-pointer group w-fit">
@@ -262,7 +267,7 @@ function renderTrainerSetup() {
             let imgUrl = `https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=80&stage=${config.stageStr}&bg=t&sch=y,r,g,w,o,b&case=${encodeURIComponent(urlAlg)}`;
             if (config.viewStr) imgUrl += `&view=${config.viewStr}`;
 
-            // Individual Case Card & Checkbox (Now with animated inner square)
+            // Individual Case Card & Checkbox
             html += `
                 <label class="relative flex flex-col items-center p-3 border-2 border-slate-700 bg-slate-800/50 rounded-xl cursor-pointer hover:bg-slate-700 hover:border-slate-500 transition-all ${isChecked ? 'border-blue-500 bg-blue-600/10 ring-1 ring-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]' : ''}">
                     <div class="absolute top-2 left-2 z-10">
@@ -300,6 +305,20 @@ function renderTrainerSetup() {
     
     updateSelectionCount();
 }
+
+// --- MASTER CHECKBOX LISTENER ---
+document.getElementById('master-select-all').addEventListener('change', (e) => {
+    let targetCases = stageConfig[trainSelectedStage].data;
+    if (trainCurrentCategory !== 'All') targetCases = targetCases.filter(c => c.cat === trainCurrentCategory);
+    
+    if (e.target.checked) {
+        targetCases.forEach(c => selectedTrainCases.add(c.id));
+    } else {
+        targetCases.forEach(c => selectedTrainCases.delete(c.id));
+    }
+    renderTrainerSetup();
+    updateSelectionCount();
+});
 
 document.querySelectorAll('.train-stage-tab').forEach(tab => {
     tab.addEventListener('click', (e) => {
@@ -433,20 +452,18 @@ function updateTimer() {
 }
 
 function handleTimerDown(e) {
-    // 1. Ensure we are actually in an active training session
     if (trainActivePanel.classList.contains('hidden') || currentView !== 'train' || trainQueue.length === 0) return;
     
-    // 2. Handle Keyboard vs Touch differently
+    if (currentTrainIndex >= trainQueue.length) return; 
+    
     if (e.type === 'keydown') {
-        if (e.code !== 'Space') return; // Ignore all keys except Space
-        e.preventDefault(); // Stop the browser from scrolling or clicking focused buttons
-        if (document.activeElement) document.activeElement.blur(); // Force focus away from any toggles/buttons
+        if (e.code !== 'Space') return; 
+        e.preventDefault(); 
+        if (document.activeElement) document.activeElement.blur(); 
     } else {
-        // It's a Touch event: Ignore if the user is explicitly tapping a UI button or toggle
         if (e.target.closest('button') || e.target.closest('label') || e.target.tagName === 'INPUT') return;
     }
     
-    // 3. Timer State Logic
     if (timerState === 'IDLE' || timerState === 'STOPPED') {
         timerState = 'READY';
         timerDisplay.style.color = '#22c55e'; 
@@ -473,6 +490,8 @@ function handleTimerDown(e) {
 }
 
 function handleTimerUp(e) {
+    if (currentTrainIndex >= trainQueue.length) return;
+
     if (e.type === 'keyup') {
         if (e.code !== 'Space') return;
         e.preventDefault();
