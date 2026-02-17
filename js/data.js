@@ -31,10 +31,10 @@ export const f2lCases = [
 
     // --- CONNECTED PAIRS (23-24) ---
     { id: 23, cat: 'Connected Pairs', opt: "R U' R' U' R U R' U2 R U R'", alts: ["U2 R2 U2 R' U' R U' R2"] },
+    { id: 24, cat: 'Connected Pairs', opt: "F U R U' R' F' R U' R'", alts: ["y' R' U' R U2 R' U' R U R' U' R", "U' R U R2 F R F' R U' R'", "y U' L' U L U L' U L U' L' U L"] },
 
     // --- CORNER IN SLOT (25-30) ---
-    { id: 24, cat: 'Corner In Slot', opt: "U R U' R' d' L' U L", alts: ["F U R U' R' F' R U' R'"] },
-    { id: 25, cat: 'Corner In Slot', opt: "U' R' F R F' R U R'", alts: ["R' U' R' U' R' U R U R"] },
+    { id: 25, cat: 'Corner In Slot', opt: "U' R' F R F' R U R'", alts: ["R' U' R' U' R' U R U R", "U' F' R U R' U' R' F R"] },,
     { id: 26, cat: 'Corner In Slot', opt: "U R U' R' F R' F' R", alts: ["R S' R' U R S R'"] },
     { id: 27, cat: 'Corner In Slot', opt: "R U' R' U R U' R'", alts: ["U2 R U' R' U R U' R'"] },
     { id: 28, cat: 'Corner In Slot', opt: "y' R' U R U' R' U R", alts: ["y L' U L U' L' U L"] },
