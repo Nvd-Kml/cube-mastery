@@ -1,4 +1,3 @@
-// /js/app.js
 import { f2lCases, ollCases, pllCases } from './data.js';
 
 // --- Local Storage Stats Engine ---
@@ -58,12 +57,10 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
         currentView = e.currentTarget.getAttribute('data-view');
 
-        // Sync Desktop buttons
         document.querySelectorAll('.desktop-nav').forEach(b => {
             b.className = b.getAttribute('data-view') === currentView ? desktopActive : desktopInactive;
         });
         
-        // Sync Mobile buttons
         document.querySelectorAll('.mobile-nav').forEach(b => {
             b.className = b.getAttribute('data-view') === currentView ? mobileActive : mobileInactive;
         });
@@ -81,11 +78,10 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     });
 });
 
-// Logo Router (Routes to Learn view without refreshing)
 document.querySelectorAll('.logo-link').forEach(link => {
     link.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevents the page from jumping to the top or refreshing
-        document.querySelector('.nav-btn[data-view="learn"]').click(); // Simulates a click on the Library button
+        e.preventDefault(); 
+        document.querySelector('.nav-btn[data-view="learn"]').click(); 
     });
 });
 
@@ -269,7 +265,6 @@ function renderTrainerSetup() {
     document.getElementById('trainer-case-list').innerHTML = html;
     
     document.querySelectorAll('.case-checkbox').forEach(box => {
-        // Use click on parent label rather than change on checkbox for better mobile tap areas
         box.closest('label').addEventListener('click', (e) => {
             e.preventDefault();
             const checkbox = e.currentTarget.querySelector('.case-checkbox');
@@ -326,11 +321,11 @@ document.getElementById('btn-deselect-all').addEventListener('click', () => {
 let timerState = 'IDLE'; 
 let startTime = 0;
 let timerInterval = null;
+
 const timerDisplay = document.getElementById('timer-display');
 const scrambleDisplay = document.getElementById('train-scramble');
 const imageDisplay = document.getElementById('train-image');
 const placeholderDisplay = document.getElementById('train-placeholder');
-const manualNextBtn = document.getElementById('manual-next-btn');
 const autoNextToggle = document.getElementById('auto-next-toggle');
 const showSolutionToggle = document.getElementById('show-solution-toggle');
 const solutionContainer = document.getElementById('train-solution-container');
@@ -338,6 +333,9 @@ const solutionText = document.getElementById('train-solution');
 const trainPbDisplay = document.getElementById('train-pb-display');
 const trainPbText = document.getElementById('train-pb-text');
 const trainActivePanel = document.getElementById('train-active-panel');
+const trainNavButtons = document.getElementById('train-nav-buttons');
+const prevCaseBtn = document.getElementById('prev-case-btn');
+const nextCaseBtn = document.getElementById('next-case-btn');
 
 showSolutionToggle.addEventListener('change', () => {
     if (trainQueue.length > 0 && currentTrainIndex < trainQueue.length) {
@@ -384,16 +382,23 @@ function updateTrainerPBUI(stage, id) {
 
 function loadActiveTrainCase() {
     if (trainQueue.length === 0) return;
+    
+    // Check if session is complete
     if (currentTrainIndex >= trainQueue.length) {
         scrambleDisplay.textContent = "Session Complete!";
         solutionContainer.classList.add('hidden'); 
         trainPbDisplay.classList.add('hidden');
         imageDisplay.classList.add('hidden');
         placeholderDisplay.classList.remove('hidden');
+        trainNavButtons.classList.add('hidden'); // Hide Skip/Prev on complete
         timerDisplay.textContent = "0.00";
         document.getElementById('train-queue-counter').textContent = "Done";
         return;
     }
+
+    // Initialize UI for Active Case
+    trainNavButtons.classList.remove('hidden');
+    prevCaseBtn.disabled = currentTrainIndex === 0;
 
     const c = trainQueue[currentTrainIndex];
     const config = stageConfig[trainSelectedStage];
@@ -417,8 +422,6 @@ function loadActiveTrainCase() {
     timerDisplay.textContent = "0.00";
     timerDisplay.style.color = "white";
     timerState = 'IDLE';
-
-    manualNextBtn.classList.toggle('hidden', autoNextToggle.checked);
 }
 
 document.getElementById('stop-session-btn').addEventListener('click', () => {
@@ -433,9 +436,7 @@ function updateTimer() {
 }
 
 function handleTimerDown(e) {
-    // Ignore if clicking a button or toggle switch
     if (e.target.closest('button') || e.target.closest('label') || e.target.tagName === 'INPUT') return;
-    
     if (trainActivePanel.classList.contains('hidden') || currentView !== 'train' || trainQueue.length === 0) return;
     
     if (e.type === 'keydown' && e.code !== 'Space') return;
@@ -457,18 +458,17 @@ function handleTimerDown(e) {
         
         if (autoNextToggle.checked && currentTrainIndex < trainQueue.length) {
             setTimeout(() => {
-                currentTrainIndex++;
-                loadActiveTrainCase();
+                if (timerState === 'STOPPED') {
+                    currentTrainIndex++;
+                    loadActiveTrainCase();
+                }
             }, 1000); 
-        } else if (currentTrainIndex < trainQueue.length) {
-            manualNextBtn.classList.remove('hidden');
         }
     }
 }
 
 function handleTimerUp(e) {
     if (e.type === 'keyup' && e.code !== 'Space') return;
-    
     if (timerState === 'READY') {
         timerState = 'RUNNING';
         timerDisplay.style.color = 'white';
@@ -477,21 +477,27 @@ function handleTimerUp(e) {
     }
 }
 
-// Attach Desktop Keyboard Events
+// Attach Keyboard & Touch Events
 window.addEventListener('keydown', handleTimerDown);
 window.addEventListener('keyup', handleTimerUp);
-
-// Attach Mobile Touch Events (Transforms the whole panel into a touch target)
 trainActivePanel.addEventListener('touchstart', handleTimerDown, {passive: false});
 trainActivePanel.addEventListener('touchend', handleTimerUp);
 
-manualNextBtn.addEventListener('click', () => {
-    currentTrainIndex++;
-    loadActiveTrainCase();
+// --- NEW NAVIGATION BUTTON LISTENERS ---
+prevCaseBtn.addEventListener('click', () => {
+    if (currentTrainIndex > 0) {
+        clearInterval(timerInterval);
+        timerState = 'IDLE';
+        currentTrainIndex--;
+        loadActiveTrainCase();
+    }
 });
 
-autoNextToggle.addEventListener('change', () => {
-    if (timerState === 'STOPPED') manualNextBtn.classList.toggle('hidden', autoNextToggle.checked);
+nextCaseBtn.addEventListener('click', () => {
+    clearInterval(timerInterval);
+    timerState = 'IDLE';
+    currentTrainIndex++;
+    loadActiveTrainCase();
 });
 
 // ==========================================

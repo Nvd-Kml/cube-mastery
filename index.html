@@ -181,9 +181,15 @@
                             Hold Space or Touch Screen to ready.
                         </p>
                         
-                        <button id="manual-next-btn" class="mt-6 px-8 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg font-bold text-white transition-colors hidden z-20">
-                            Next Case <i class="fa-solid fa-arrow-right ml-2"></i>
-                        </button>
+                        <div id="train-nav-buttons" class="mt-8 flex w-full max-w-sm gap-3 z-20">
+                            <button id="prev-case-btn" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg font-bold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+                                <i class="fa-solid fa-arrow-left mr-2"></i> Prev
+                            </button>
+                            <button id="next-case-btn" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg font-bold text-white transition-colors flex items-center justify-center">
+                                Skip / Next <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </section>
