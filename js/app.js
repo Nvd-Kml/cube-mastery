@@ -114,7 +114,7 @@ function renderFilters() {
     filterPills.innerHTML = categories.map(cat => {
         const isActive = cat === currentCategory;
         const activeClasses = isActive ? "bg-blue-600/20 border-blue-500 text-blue-400" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700";
-        return `<button class="filter-btn px-3 py-1 rounded-full text-sm font-semibold transition-all cursor-pointer border ${activeClasses}" data-cat="${cat}">${cat}</button>`;
+        return `<button class="filter-btn shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-sm font-semibold transition-all cursor-pointer border ${activeClasses}" data-cat="${cat}">${cat}</button>`;
     }).join('');
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -227,7 +227,7 @@ let trainQueue = [];
 let currentTrainIndex = 0;
 
 function updateSelectionCount() {
-    document.getElementById('train-selection-count').textContent = `${selectedTrainCases.size} Cases Selected`;
+    document.getElementById('selection-number-only').textContent = selectedTrainCases.size;
 }
 
 function renderTrainFilters() {
@@ -237,7 +237,7 @@ function renderTrainFilters() {
     document.getElementById('train-filter-pills').innerHTML = categories.map(cat => {
         const isActive = cat === trainCurrentCategory;
         const activeClasses = isActive ? "bg-blue-600/20 border-blue-500 text-blue-400" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700";
-        return `<button class="train-filter-btn px-3 py-1 rounded-full text-sm font-semibold transition-all cursor-pointer border ${activeClasses}" data-cat="${cat}">${cat}</button>`;
+        return `<button class="train-filter-btn shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-sm font-semibold transition-all cursor-pointer border ${activeClasses}" data-cat="${cat}">${cat}</button>`;
     }).join('');
 
     document.querySelectorAll('.train-filter-btn').forEach(btn => {
