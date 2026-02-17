@@ -31,6 +31,11 @@
             <button class="nav-btn desktop-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all" data-view="train">
                 <i class="fa-solid fa-stopwatch w-5"></i> Trainer
             </button>
+
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-8 pl-3">Analytics</div>
+            <button class="nav-btn desktop-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all" data-view="stats">
+                <i class="fa-solid fa-chart-simple w-5"></i> Dashboard
+            </button>
         </nav>
         <div class="p-4 border-t border-slate-800 text-xs text-slate-600 font-mono text-center">
             Made With ❤️
@@ -176,6 +181,17 @@
                             <i id="train-success-icon" class="fa-solid fa-circle-check text-6xl md:text-8xl text-emerald-500 hidden pointer-events-none absolute drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]"></i>
                         </div>
 
+                        <div id="session-stats-container" class="mt-8 flex gap-4 hidden z-20 w-full max-w-sm animate-fade-in">
+                            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl text-center flex-1 shadow-lg">
+                                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Session Mean</p>
+                                <p id="session-mean-text" class="text-2xl font-mono text-blue-400 font-bold">-</p>
+                            </div>
+                            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl text-center flex-1 shadow-lg">
+                                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Current Ao5</p>
+                                <p id="session-ao5-text" class="text-2xl font-mono text-purple-400 font-bold">-</p>
+                            </div>
+                        </div>
+
                         <div id="timer-display" class="text-6xl sm:text-7xl md:text-9xl lg:text-[10rem] font-mono font-bold tracking-tighter text-white transition-colors duration-150 select-none pointer-events-none">
                             0.00
                         </div>
@@ -202,6 +218,38 @@
                     </div>
                 </div>
             </section>
+
+            <section id="view-stats" class="view-section w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 hidden animate-fade-in pb-24">
+                <div class="mb-6">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2">Performance Dashboard</h2>
+                    <p class="text-slate-400 text-sm md:text-base">Track your lifetime progress and identify cases that need practice.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-cubes text-3xl text-blue-500 mb-2"></i>
+                        <p class="text-sm text-slate-400 font-bold uppercase tracking-wider">Total Lifetime Solves</p>
+                        <p id="stats-total-solves" class="text-4xl md:text-5xl font-mono font-bold text-white mt-2">0</p>
+                    </div>
+                </div>
+
+                <div class="flex bg-slate-800 p-1 rounded-lg border border-slate-700 w-fit mb-6">
+                    <button id="stats-tab-f2l" class="stats-stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg text-sm md:text-base" data-stage="F2L">F2L</button>
+                    <button id="stats-tab-oll" class="stats-stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm md:text-base" data-stage="OLL">OLL</button>
+                    <button id="stats-tab-pll" class="stats-stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm md:text-base" data-stage="PLL">PLL</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-800 rounded-2xl border border-slate-700 p-4 sm:p-6 shadow-lg">
+                        <h3 class="text-lg font-bold text-red-400 mb-4 flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Needs Practice (Slowest Avg)</h3>
+                        <div id="stats-slowest-list" class="space-y-3"></div>
+                    </div>
+                    <div class="bg-slate-800 rounded-2xl border border-slate-700 p-4 sm:p-6 shadow-lg">
+                        <h3 class="text-lg font-bold text-emerald-400 mb-4 flex items-center"><i class="fa-solid fa-bolt mr-2"></i> Best Cases (Fastest PBs)</h3>
+                        <div id="stats-fastest-list" class="space-y-3"></div>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <nav class="md:hidden bg-slate-950 border-t border-slate-800 flex justify-around p-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
@@ -212,6 +260,10 @@
             <button class="nav-btn mobile-nav flex-1 flex flex-col items-center p-2 rounded-lg text-slate-500 hover:text-slate-300 transition-colors" data-view="train">
                 <i class="fa-solid fa-stopwatch text-xl mb-1"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wider">Trainer</span>
+            </button>
+            <button class="nav-btn mobile-nav flex-1 flex flex-col items-center p-2 rounded-lg text-slate-500 hover:text-slate-300 transition-colors" data-view="stats">
+                <i class="fa-solid fa-chart-simple text-xl mb-1"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Stats</span>
             </button>
         </nav>
 

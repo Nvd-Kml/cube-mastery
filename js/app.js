@@ -15,6 +15,20 @@ function getPB(stage, id) {
     return Math.min(...userStats[stage][id]).toFixed(2);
 }
 
+let sessionTimes = []; // Tracks current session times
+
+function calcMean(times) {
+    if (!times || times.length === 0) return 0;
+    return (times.reduce((a, b) => a + b, 0) / times.length).toFixed(2);
+}
+
+function calcAo5(times) {
+    if (!times || times.length < 5) return null;
+    const last5 = times.slice(-5).sort((a, b) => a - b);
+    const sum = last5[1] + last5[2] + last5[3]; // Drop best and worst
+    return (sum / 3).toFixed(2);
+}
+
 // --- State Management ---
 let currentView = 'learn'; 
 let currentStage = 'F2L'; 
@@ -74,6 +88,8 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
             renderTrainerSetup();
         } else if (currentView === 'learn') {
             renderCards(); 
+        } else if (currentView === 'stats') {
+            renderStats(); // Update dashboard when clicked
         }
     });
 });
@@ -374,6 +390,7 @@ document.getElementById('start-selected-btn').addEventListener('click', () => {
     
     document.getElementById('train-setup-panel').classList.add('hidden');
     document.getElementById('train-active-panel').classList.remove('hidden');
+    sessionTimes = [];
     loadActiveTrainCase();
 });
 
@@ -419,11 +436,17 @@ function loadActiveTrainCase() {
         timerInstruction.classList.add('hidden'); // Hide the spacebar instruction
         retrySessionBtn.classList.remove('hidden'); // Show Retry Button
         
+        document.getElementById('session-stats-container').classList.remove('hidden');
+        document.getElementById('session-mean-text').textContent = sessionTimes.length > 0 ? `${calcMean(sessionTimes)}s` : '-';
+        const ao5 = calcAo5(sessionTimes);
+        document.getElementById('session-ao5-text').textContent = ao5 ? `${ao5}s` : '-';
+
         document.getElementById('train-queue-counter').textContent = "Done";
         return;
     }
 
     // Initialize UI for Active Case
+    document.getElementById('session-stats-container').classList.add('hidden');
     trainScrambleTitle.classList.remove('hidden');
     timerDisplay.classList.remove('hidden');
     timerInstruction.classList.remove('hidden');
@@ -491,6 +514,7 @@ function handleTimerDown(e) {
         timerDisplay.textContent = (finalTimeMs / 1000).toFixed(2);
         
         const currentCase = trainQueue[currentTrainIndex];
+        sessionTimes.push(finalTimeMs / 1000);
         saveTime(trainSelectedStage, currentCase.id, finalTimeMs);
         updateTrainerPBUI(trainSelectedStage, currentCase.id);
         
@@ -548,6 +572,7 @@ nextCaseBtn.addEventListener('click', () => {
 retrySessionBtn.addEventListener('click', () => {
     trainQueue.sort(() => Math.random() - 0.5); 
     currentTrainIndex = 0;
+    sessionTimes = [];
     loadActiveTrainCase();
 });
 
@@ -563,4 +588,73 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(reg => console.log('Service Worker Registered!', reg))
         .catch(err => console.error('Service Worker Registration Failed:', err));
     }
+});
+
+// ==========================================
+// DASHBOARD & STATS ENGINE
+// ==========================================
+let statsSelectedStage = 'F2L';
+
+function renderStats() {
+    let total = 0;
+    ['F2L', 'OLL', 'PLL'].forEach(s => {
+        for (let id in userStats[s]) total += userStats[s][id].length;
+    });
+    document.getElementById('stats-total-solves').textContent = total;
+
+    const stageData = userStats[statsSelectedStage];
+    const prefix = stageConfig[statsSelectedStage].prefix;
+    let caseStats = [];
+    
+    for (let id in stageData) {
+        if (stageData[id].length > 0) {
+            const times = stageData[id];
+            caseStats.push({ 
+                id: id, 
+                avg: parseFloat(calcMean(times)), 
+                pb: parseFloat(Math.min(...times).toFixed(2)), 
+                count: times.length 
+            });
+        }
+    }
+
+    const slowestList = document.getElementById('stats-slowest-list');
+    const fastestList = document.getElementById('stats-fastest-list');
+
+    if (caseStats.length === 0) {
+        slowestList.innerHTML = '<p class="text-slate-500 text-sm italic py-4">No solves recorded yet for this stage.</p>';
+        fastestList.innerHTML = '<p class="text-slate-500 text-sm italic py-4">No solves recorded yet for this stage.</p>';
+        return;
+    }
+
+    const slowest = [...caseStats].sort((a, b) => b.avg - a.avg).slice(0, 5);
+    slowestList.innerHTML = slowest.map(c => `
+        <div class="flex justify-between items-center bg-slate-900/80 p-3 sm:p-4 rounded-xl border border-slate-700">
+            <span class="font-bold text-slate-200 text-sm sm:text-base">${prefix} ${c.id}</span>
+            <div class="text-right">
+                <span class="block font-mono text-red-400 font-bold text-base sm:text-lg">${c.avg}s avg</span>
+                <span class="block text-[10px] sm:text-xs text-slate-500 uppercase tracking-widest">${c.count} solves</span>
+            </div>
+        </div>
+    `).join('');
+
+    const fastest = [...caseStats].sort((a, b) => a.pb - b.pb).slice(0, 5);
+    fastestList.innerHTML = fastest.map(c => `
+        <div class="flex justify-between items-center bg-slate-900/80 p-3 sm:p-4 rounded-xl border border-slate-700">
+            <span class="font-bold text-slate-200 text-sm sm:text-base">${prefix} ${c.id}</span>
+            <div class="text-right">
+                <span class="block font-mono text-emerald-400 font-bold text-base sm:text-lg">${c.pb}s pb</span>
+                <span class="block text-[10px] sm:text-xs text-slate-500 uppercase tracking-widest">${c.count} solves</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+document.querySelectorAll('.stats-stage-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.stats-stage-tab').forEach(t => t.className = 'stats-stage-tab px-6 py-2 rounded-md font-bold transition-all text-slate-400 hover:text-white text-sm md:text-base');
+        e.target.className = 'stats-stage-tab px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg text-sm md:text-base';
+        statsSelectedStage = e.target.getAttribute('data-stage');
+        renderStats();
+    });
 });
