@@ -77,6 +77,11 @@
                             <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-1.5 md:py-2 border border-slate-700 rounded-lg bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm transition-colors" placeholder="Search cases...">
                         </div>
                     </div>
+
+                    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-800 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-1"><i class="fa-solid fa-graduation-cap mr-1"></i> Status:</span>
+                        <div id="status-filter-pills" class="flex gap-2"></div>
+                    </div>
                 </div>
 
                 <p id="results-count" class="text-slate-400 mb-4 md:mb-6 font-mono text-xs md:text-sm"></p>

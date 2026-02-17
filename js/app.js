@@ -1,7 +1,19 @@
 import { f2lCases, ollCases, pllCases } from './data.js';
 
-// --- Local Storage Stats Engine ---
-let userStats = JSON.parse(localStorage.getItem('cubemastery_stats')) || { F2L: {}, OLL: {}, PLL: {} };
+// --- Local Storage Stats & Progress Engine ---
+let userStats = { F2L: {}, OLL: {}, PLL: {} };
+try {
+    const parsedStats = JSON.parse(localStorage.getItem('cubemastery_stats'));
+    if (parsedStats) userStats = { ...userStats, ...parsedStats };
+} catch (e) {}
+
+let learnedCases = { F2L: [], OLL: [], PLL: [] };
+try {
+    const parsedLearned = JSON.parse(localStorage.getItem('cubemastery_learned'));
+    if (parsedLearned) learnedCases = { ...learnedCases, ...parsedLearned };
+} catch (e) {}
+
+let learnStatusFilter = 'All';
 
 function saveTime(stage, id, timeMs) {
     let timeSec = parseFloat((timeMs / 1000).toFixed(2));
@@ -125,11 +137,37 @@ function renderFilters() {
     });
 }
 
+function renderStatusFilters() {
+    const statuses = ['All', 'Learned', 'Learning'];
+    document.getElementById('status-filter-pills').innerHTML = statuses.map(status => {
+        const isActive = status === learnStatusFilter;
+        const activeClasses = isActive ? "bg-emerald-600/20 border-emerald-500 text-emerald-400 shadow-inner" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700";
+        return `<button class="status-btn shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border ${activeClasses}" data-status="${status}">${status}</button>`;
+    }).join('');
+
+    document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            learnStatusFilter = e.target.getAttribute('data-status');
+            renderApp();
+        });
+    });
+}
+
 function renderCards() {
     const config = stageConfig[currentStage];
     let filteredData = config.data;
     
+    const container = document.getElementById('card-container'); 
+    const stageLearned = learnedCases[currentStage] || []; 
+    
     if (currentCategory !== 'All') filteredData = filteredData.filter(c => c.cat === currentCategory);
+
+    if (learnStatusFilter === 'Learned') {
+        filteredData = filteredData.filter(c => stageLearned.includes(c.id));
+    } else if (learnStatusFilter === 'Learning') {
+        filteredData = filteredData.filter(c => !stageLearned.includes(c.id));
+    }
+
     if (searchQuery) {
         const q = searchQuery.toLowerCase().replace(/[()']/g, '');
         filteredData = filteredData.filter(c => {
@@ -169,16 +207,25 @@ function renderCards() {
                 </details>`;
         }
 
+        const isLearned = stageLearned.includes(c.id);
+
         return `
-        <div class="bg-slate-800 rounded-2xl p-4 sm:p-6 border border-slate-700 cube-hover flex flex-col sm:flex-row items-start gap-4 sm:gap-6 animate-fade-in relative">
+        <div class="bg-slate-800 rounded-2xl p-4 sm:p-6 border border-slate-700 cube-hover flex flex-col sm:flex-row items-start gap-4 sm:gap-6 animate-fade-in relative ${isLearned ? 'ring-1 ring-emerald-500/30 bg-emerald-900/10' : ''}">
             <div class="flex-shrink-0 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center gap-4 h-auto w-full sm:w-40 mx-auto">
                 <img src="${imgUrl}" alt="${config.prefix} Case ${c.id}" class="w-full h-auto object-contain max-w-[8rem] sm:max-w-none" loading="lazy" decoding="async">
-                <button class="train-this-btn w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 sm:py-2 rounded transition-colors" data-id="${c.id}" data-stage="${currentStage}">Train Case</button>
+                <button class="train-this-btn w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 sm:py-2 rounded transition-colors shadow-lg" data-id="${c.id}" data-stage="${currentStage}">Train Case</button>
             </div>
             <div class="flex-grow w-full">
-                <div class="flex flex-wrap gap-2 justify-between items-center mb-2">
-                    <h3 class="text-xl font-bold">${config.prefix} ${c.id} <span class="text-sm font-normal text-slate-400 ml-2">${c.cat}</span></h3>
-                    ${pbHtml}
+                <div class="flex flex-wrap gap-3 justify-between items-start mb-3 w-full pb-3 border-b border-slate-700/50">
+                    <div class="flex flex-col gap-1.5">
+                        <h3 class="text-xl font-bold flex items-center gap-2">${config.prefix} ${c.id} <span class="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700">${c.cat}</span></h3>
+                        ${pbHtml}
+                    </div>
+                    
+                    <button class="learned-toggle-btn flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${isLearned ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/20 shadow-inner' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-500'}" data-id="${c.id}" data-stage="${currentStage}">
+                        <i class="${isLearned ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} pointer-events-none text-lg"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider pointer-events-none">${isLearned ? 'Learned' : 'Learning'}</span>
+                    </button>
                 </div>
                 <div class="space-y-3 mt-4">
                     <div class="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10"><span class="block text-xs text-blue-400 font-bold mb-1">Setup Scramble</span><p class="font-mono text-sm text-blue-300 break-words">${setupScramble}</p></div>
@@ -194,6 +241,26 @@ function renderCards() {
             trainSpecificCase(e.target.getAttribute('data-stage'), e.target.getAttribute('data-id'));
         });
     });
+
+    document.querySelectorAll('.learned-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const stage = e.currentTarget.getAttribute('data-stage');
+            const rawId = e.currentTarget.getAttribute('data-id');
+            const id = isNaN(rawId) ? rawId : parseInt(rawId, 10);
+            
+            if (!learnedCases[stage]) learnedCases[stage] = [];
+            
+            let idx = learnedCases[stage].indexOf(id);
+            if (idx > -1) {
+                learnedCases[stage].splice(idx, 1);
+            } else {
+                learnedCases[stage].push(id);
+            }
+            
+            localStorage.setItem('cubemastery_learned', JSON.stringify(learnedCases));
+            renderCards();
+        });
+    });
 }
 
 document.querySelectorAll('.stage-tab').forEach(tab => {
@@ -202,6 +269,7 @@ document.querySelectorAll('.stage-tab').forEach(tab => {
         e.target.className = 'stage-tab px-4 sm:px-6 py-2 rounded-md font-bold transition-all bg-blue-600 text-white shadow-lg text-sm sm:text-base';
         currentStage = e.target.id.replace('tab-', '').toUpperCase();
         currentCategory = 'All';
+        learnStatusFilter = 'All';
         renderApp();
     });
 });
@@ -213,6 +281,7 @@ document.getElementById('search-input').addEventListener('input', (e) => {
 
 function renderApp() {
     renderFilters();
+    renderStatusFilters();
     renderCards();
 }
 
@@ -573,7 +642,6 @@ window.addEventListener('keyup', handleTimerUp);
 trainActivePanel.addEventListener('touchstart', handleTimerDown, {passive: false});
 trainActivePanel.addEventListener('touchend', handleTimerUp);
 
-// --- NEW NAVIGATION BUTTON LISTENERS ---
 prevCaseBtn.addEventListener('click', () => {
     if (currentTrainIndex > 0) {
         clearInterval(timerInterval);
@@ -599,18 +667,17 @@ retrySessionBtn.addEventListener('click', () => {
 });
 
 // ==========================================
-// INITIALIZATION & PWA SERVICE WORKER
+// APP INITIALIZATION
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    renderApp();
-    renderTrainerSetup();
-    
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker Registered!', reg))
-        .catch(err => console.error('Service Worker Registration Failed:', err));
-    }
-});
+// Since type="module" executes after HTML is parsed, we can run this instantly!
+renderApp();
+renderTrainerSetup();
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+    .then(reg => console.log('Service Worker Registered!', reg))
+    .catch(err => console.error('Service Worker Registration Failed:', err));
+}
 
 // ==========================================
 // DASHBOARD & STATS ENGINE
