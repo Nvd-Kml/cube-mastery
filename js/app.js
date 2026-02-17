@@ -286,8 +286,10 @@ function renderTrainerSetup() {
     
     document.querySelectorAll('.case-checkbox').forEach(box => {
         box.addEventListener('change', (e) => {
-            if (e.target.checked) selectedTrainCases.add(e.target.value);
-            else selectedTrainCases.delete(e.target.value);
+            const val = isNaN(e.target.value) ? e.target.value : parseInt(e.target.value, 10);
+            
+            if (e.target.checked) selectedTrainCases.add(val);
+            else selectedTrainCases.delete(val);
             
             renderTrainerSetup();
             updateSelectionCount();
