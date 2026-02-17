@@ -234,13 +234,17 @@ function renderTrainerSetup() {
         const catCases = config.data.filter(c => c.cat === cat);
         const allChecked = catCases.every(c => selectedTrainCases.has(c.id));
         
+        // Category Header & Checkbox (Now with animated inner square)
         html += `
         <div class="mb-8 animate-fade-in">
-            <div class="flex items-center mb-4">
-                <input type="checkbox" id="cat-${cat.replace(/\s+/g, '-')}" class="cat-checkbox w-6 h-6 text-blue-600 bg-slate-900 border-slate-600 rounded focus:ring-blue-500" data-cat="${cat}" ${allChecked ? 'checked' : ''}>
-                <label for="cat-${cat.replace(/\s+/g, '-')}" class="ml-3 text-lg md:text-xl font-bold text-white cursor-pointer select-none">${cat}</label>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 pl-0 sm:pl-8">
+            <label class="flex items-center mb-4 cursor-pointer group w-fit">
+                <div class="relative flex items-center justify-center">
+                    <input type="checkbox" id="cat-${cat.replace(/\s+/g, '-')}" class="cat-checkbox peer sr-only" data-cat="${cat}" ${allChecked ? 'checked' : ''}>
+                    <div class="w-6 h-6 bg-slate-800 border-2 border-slate-600 rounded flex items-center justify-center peer-checked:bg-blue-600 peer-checked:border-blue-500 transition-all shadow-inner group-hover:border-blue-400 after:content-[''] after:w-2.5 after:h-2.5 after:bg-white after:rounded-sm after:scale-0 peer-checked:after:scale-100 after:transition-transform after:duration-200"></div>
+                </div>
+                <span class="ml-3 text-lg md:text-xl font-bold text-white group-hover:text-blue-400 transition-colors select-none">${cat}</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 pl-0 sm:pl-5 sm:border-l-2 border-slate-800 sm:ml-3">
         `;
         
         catCases.forEach(c => {
@@ -249,13 +253,15 @@ function renderTrainerSetup() {
             let imgUrl = `https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=80&stage=${config.stageStr}&bg=t&sch=y,r,g,w,o,b&case=${encodeURIComponent(urlAlg)}`;
             if (config.viewStr) imgUrl += `&view=${config.viewStr}`;
 
+            // Individual Case Card & Checkbox (Now with animated inner square)
             html += `
-                <label class="relative flex flex-col items-center p-3 border-2 border-slate-700 bg-slate-800/50 rounded-xl cursor-pointer hover:bg-slate-700 transition-colors ${isChecked ? 'border-blue-500 bg-blue-600/20' : ''}">
-                    <div class="absolute top-2 left-2">
-                        <input type="checkbox" class="case-checkbox w-5 h-5 text-blue-600 bg-slate-900 border-slate-600 rounded focus:ring-blue-500 pointer-events-none" value="${c.id}" data-cat="${cat}" ${isChecked ? 'checked' : ''}>
+                <label class="relative flex flex-col items-center p-3 border-2 border-slate-700 bg-slate-800/50 rounded-xl cursor-pointer hover:bg-slate-700 hover:border-slate-500 transition-all ${isChecked ? 'border-blue-500 bg-blue-600/10 ring-1 ring-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]' : ''}">
+                    <div class="absolute top-2 left-2 z-10">
+                        <input type="checkbox" class="case-checkbox peer sr-only" value="${c.id}" data-cat="${cat}" ${isChecked ? 'checked' : ''}>
+                        <div class="w-5 h-5 bg-slate-900 border-2 border-slate-600 rounded flex items-center justify-center peer-checked:bg-blue-500 peer-checked:border-blue-500 transition-all after:content-[''] after:w-2 after:h-2 after:bg-white after:rounded-sm after:scale-0 peer-checked:after:scale-100 after:transition-transform after:duration-200"></div>
                     </div>
-                    <img src="${imgUrl}" class="w-16 h-16 mb-2 pointer-events-none" />
-                    <span class="text-sm font-bold text-slate-300 pointer-events-none">${config.prefix} ${c.id}</span>
+                    <img src="${imgUrl}" class="w-16 h-16 mb-2 pointer-events-none drop-shadow-lg" />
+                    <span class="text-sm font-bold ${isChecked ? 'text-blue-400' : 'text-slate-300'} pointer-events-none transition-colors">${config.prefix} ${c.id}</span>
                 </label>
             `;
         });
@@ -265,13 +271,9 @@ function renderTrainerSetup() {
     document.getElementById('trainer-case-list').innerHTML = html;
     
     document.querySelectorAll('.case-checkbox').forEach(box => {
-        box.closest('label').addEventListener('click', (e) => {
-            e.preventDefault();
-            const checkbox = e.currentTarget.querySelector('.case-checkbox');
-            checkbox.checked = !checkbox.checked;
-            
-            if (checkbox.checked) selectedTrainCases.add(checkbox.value);
-            else selectedTrainCases.delete(checkbox.value);
+        box.addEventListener('change', (e) => {
+            if (e.target.checked) selectedTrainCases.add(e.target.value);
+            else selectedTrainCases.delete(e.target.value);
             
             renderTrainerSetup();
             updateSelectionCount();
@@ -299,20 +301,6 @@ document.querySelectorAll('.train-stage-tab').forEach(tab => {
         selectedTrainCases.clear(); 
         renderTrainerSetup();
     });
-});
-
-document.getElementById('btn-select-all').addEventListener('click', () => {
-    let targetCases = stageConfig[trainSelectedStage].data;
-    if (trainCurrentCategory !== 'All') targetCases = targetCases.filter(c => c.cat === trainCurrentCategory);
-    targetCases.forEach(c => selectedTrainCases.add(c.id));
-    renderTrainerSetup();
-});
-
-document.getElementById('btn-deselect-all').addEventListener('click', () => {
-    let targetCases = stageConfig[trainSelectedStage].data;
-    if (trainCurrentCategory !== 'All') targetCases = targetCases.filter(c => c.cat === trainCurrentCategory);
-    targetCases.forEach(c => selectedTrainCases.delete(c.id));
-    renderTrainerSetup();
 });
 
 // ==========================================
