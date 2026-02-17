@@ -135,13 +135,22 @@ function renderCards() {
 
         let altsHtml = '';
         if (c.alts && c.alts.length > 0) {
-            altsHtml += `<div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative 1</span><p class="font-mono text-slate-300">${c.alts[0]}</p></div>`;
-            if (c.alts.length > 1) {
-                let extraAlts = c.alts.slice(1).map((alt, i) => `<div class="p-3 mt-2 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative ${i + 2}</span><p class="font-mono text-slate-300">${alt}</p></div>`).join('');
-                altsHtml += `<details class="group mt-2"><summary class="cursor-pointer text-sm font-bold text-blue-400 hover:text-blue-300 flex items-center select-none py-2"><i class="fa-solid fa-chevron-right mr-2 transition-transform duration-200 group-open:rotate-90"></i>Show ${c.alts.length - 1} More</summary><div class="mt-2 pl-3 border-l-2 border-blue-500/30 space-y-2 animate-fade-in">${extraAlts}</div></details>`;
-            }
-        } else if (c.alt) {
-            altsHtml += `<div class="p-3 rounded-lg border border-slate-700 bg-slate-900/50"><span class="block text-xs text-slate-400 font-bold mb-1">Alternative</span><p class="font-mono text-slate-300">${c.alt}</p></div>`;
+            let altBlocks = c.alts.map((alt, i) => `
+                <div class="p-3 mb-2 last:mb-0 rounded-lg border border-slate-700 bg-slate-900/50">
+                    <span class="block text-xs text-slate-400 font-bold mb-1">Alternative ${i + 1}</span>
+                    <p class="font-mono text-slate-300 break-words">${alt}</p>
+                </div>`).join('');
+            
+            altsHtml += `
+                <details class="group mt-2">
+                    <summary class="cursor-pointer text-sm font-bold text-blue-400 hover:text-blue-300 flex items-center select-none py-2">
+                        <i class="fa-solid fa-chevron-right mr-2 transition-transform duration-200 group-open:rotate-90"></i>
+                        View Alternative${c.alts.length > 1 ? 's' : ''}
+                    </summary>
+                    <div class="mt-2 pl-3 border-l-2 border-blue-500/30 animate-fade-in">
+                        ${altBlocks}
+                    </div>
+                </details>`;
         }
 
         return `
