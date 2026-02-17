@@ -156,7 +156,7 @@ function renderCards() {
         return `
         <div class="bg-slate-800 rounded-2xl p-4 sm:p-6 border border-slate-700 cube-hover flex flex-col sm:flex-row items-start gap-4 sm:gap-6 animate-fade-in relative">
             <div class="flex-shrink-0 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center gap-4 h-auto w-full sm:w-40 mx-auto">
-                <img src="${imgUrl}" alt="${config.prefix} Case ${c.id}" class="w-full h-auto object-contain max-w-[8rem] sm:max-w-none">
+                <img src="${imgUrl}" alt="${config.prefix} Case ${c.id}" class="w-full h-auto object-contain max-w-[8rem] sm:max-w-none" loading="lazy" decoding="async">
                 <button class="train-this-btn w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 sm:py-2 rounded transition-colors" data-id="${c.id}" data-stage="${currentStage}">Train Case</button>
             </div>
             <div class="flex-grow w-full">
@@ -269,7 +269,7 @@ function renderTrainerSetup() {
                         <input type="checkbox" class="case-checkbox peer sr-only" value="${c.id}" data-cat="${cat}" ${isChecked ? 'checked' : ''}>
                         <div class="w-5 h-5 bg-slate-900 border-2 border-slate-600 rounded flex items-center justify-center peer-checked:bg-blue-500 peer-checked:border-blue-500 transition-all after:content-[''] after:w-2 after:h-2 after:bg-white after:rounded-sm after:scale-0 peer-checked:after:scale-100 after:transition-transform after:duration-200"></div>
                     </div>
-                    <img src="${imgUrl}" class="w-16 h-16 mb-2 pointer-events-none drop-shadow-lg" />
+                    <img src="${imgUrl}" class="w-16 h-16 mb-2 pointer-events-none drop-shadow-lg" loading="lazy" decoding="async" />
                     <span class="text-sm font-bold ${isChecked ? 'text-blue-400' : 'text-slate-300'} pointer-events-none transition-colors">${config.prefix} ${c.id}</span>
                 </label>
             `;
