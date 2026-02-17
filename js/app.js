@@ -28,6 +28,7 @@ function getPB(stage, id) {
 }
 
 let sessionTimes = []; // Tracks current session times
+let sessionHistory = []; // Tracks IDs of solved cases in session to allow safe discard
 
 function calcMean(times) {
     if (!times || times.length === 0) return 0;
@@ -460,6 +461,7 @@ document.getElementById('start-selected-btn').addEventListener('click', () => {
     document.getElementById('train-setup-panel').classList.add('hidden');
     document.getElementById('train-active-panel').classList.remove('hidden');
     sessionTimes = [];
+    sessionHistory = [];
     loadActiveTrainCase();
 });
 
@@ -508,6 +510,10 @@ function loadActiveTrainCase() {
         timerInstruction.classList.add('hidden'); // Hide the spacebar instruction
         retrySessionBtn.classList.remove('hidden'); // Show Retry Button
         
+        const discardBtn = document.getElementById('discard-time-btn');
+        discardBtn.textContent = "Discard Session";
+        discardBtn.classList.remove('hidden');
+        
         document.getElementById('session-stats-container').classList.remove('hidden');
         document.getElementById('session-mean-text').textContent = sessionTimes.length > 0 ? `${calcMean(sessionTimes)}s` : '-';
         const ao5 = calcAo5(sessionTimes);
@@ -548,6 +554,7 @@ function loadActiveTrainCase() {
 
     timerDisplay.textContent = "0.00";
     timerDisplay.style.color = "white";
+    document.getElementById('discard-time-btn').classList.add('hidden');
     timerState = 'IDLE';
 
     preloadUpcomingImages(currentTrainIndex);
@@ -606,8 +613,13 @@ function handleTimerDown(e) {
         
         const currentCase = trainQueue[currentTrainIndex];
         sessionTimes.push(finalTimeMs / 1000);
+        sessionHistory.push(currentCase.id);
         saveTime(trainSelectedStage, currentCase.id, finalTimeMs);
         updateTrainerPBUI(trainSelectedStage, currentCase.id);
+            
+        const discardBtn = document.getElementById('discard-time-btn');
+        discardBtn.textContent = "Discard Time";
+        discardBtn.classList.remove('hidden'); // Show discard button
         
         if (autoNextToggle.checked && currentTrainIndex < trainQueue.length) {
             setTimeout(() => {
@@ -658,11 +670,62 @@ nextCaseBtn.addEventListener('click', () => {
     loadActiveTrainCase();
 });
 
+document.getElementById('discard-time-btn').addEventListener('click', () => {
+    if (currentTrainIndex >= trainQueue.length) {
+        if (confirm("Are you sure you want to discard this entire session?")) {
+            sessionHistory.forEach(id => {
+                if (userStats[trainSelectedStage][id]) userStats[trainSelectedStage][id].pop();
+            });
+            localStorage.setItem('cubemastery_stats', JSON.stringify(userStats));
+            
+            sessionTimes = [];
+            sessionHistory = [];
+            document.getElementById('session-mean-text').textContent = '-';
+            document.getElementById('session-ao5-text').textContent = '-';
+            document.getElementById('discard-time-btn').classList.add('hidden');
+        }
+        return;
+    }
+
+    if (sessionTimes.length === 0) return;
+    
+    sessionTimes.pop();
+    sessionHistory.pop();
+    
+    const currentCase = trainQueue[currentTrainIndex];
+    const caseTimes = userStats[trainSelectedStage][currentCase.id];
+    
+    if (caseTimes && caseTimes.length > 0) {
+        caseTimes.pop();
+        localStorage.setItem('cubemastery_stats', JSON.stringify(userStats));
+    }
+    
+    const timerDisplay = document.getElementById('timer-display');
+    timerDisplay.textContent = "0.00";
+    timerDisplay.style.color = "white";
+    document.getElementById('discard-time-btn').classList.add('hidden');
+    timerState = 'IDLE';
+    
+    document.getElementById('session-mean-text').textContent = sessionTimes.length > 0 ? `${calcMean(sessionTimes)}s` : '-';
+    const ao5 = calcAo5(sessionTimes);
+    document.getElementById('session-ao5-text').textContent = ao5 ? `${ao5}s` : '-';
+    
+    const pb = getPB(trainSelectedStage, currentCase.id);
+    const pbDisplay = document.getElementById('train-pb-display');
+    if (pb) {
+        pbDisplay.classList.remove('hidden');
+        document.getElementById('train-pb-text').textContent = `${pb}s`;
+    } else {
+        pbDisplay.classList.add('hidden');
+    }
+});
+
 // --- RETRY SESSION LISTENER ---
 retrySessionBtn.addEventListener('click', () => {
     trainQueue.sort(() => Math.random() - 0.5); 
     currentTrainIndex = 0;
     sessionTimes = [];
+    sessionHistory = [];
     loadActiveTrainCase();
 });
 
