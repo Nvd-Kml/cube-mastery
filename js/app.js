@@ -737,9 +737,14 @@ renderApp();
 renderTrainerSetup();
 
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-    .then(reg => console.log('Service Worker Registered!', reg))
-    .catch(err => console.error('Service Worker Registration Failed:', err));
+    // Only register the Service Worker if NOT on Localhost/Live Server
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker Registered!', reg))
+        .catch(err => console.error('Service Worker Registration Failed:', err));
+    } else {
+        console.log('Local development detected: Service Worker disabled for instant reloading.');
+    }
 }
 
 // ==========================================
