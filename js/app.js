@@ -477,6 +477,25 @@ function loadActiveTrainCase() {
     timerDisplay.textContent = "0.00";
     timerDisplay.style.color = "white";
     timerState = 'IDLE';
+
+    preloadUpcomingImages(currentTrainIndex);
+}
+
+function preloadUpcomingImages(currentIndex) {
+    const config = stageConfig[trainSelectedStage];
+    // Secretly download the next 3 images in the queue
+    for (let i = 1; i <= 3; i++) {
+        if (currentIndex + i < trainQueue.length) {
+            const c = trainQueue[currentIndex + i];
+            const urlAlg = c.opt.replace(/[()]/g, '');
+            let imgUrl = `https://visualcube.api.cubing.net/visualcube.php?fmt=svg&size=300&stage=${config.stageStr}&bg=t&sch=y,r,g,w,o,b&case=${encodeURIComponent(urlAlg)}`;
+            if (config.viewStr) imgUrl += `&view=${config.viewStr}`;
+            
+            // Forcing the browser to fetch and cache the image in RAM
+            const preloader = new Image();
+            preloader.src = imgUrl; 
+        }
+    }
 }
 
 document.getElementById('stop-session-btn').addEventListener('click', () => {
