@@ -396,7 +396,10 @@ document.getElementById('start-selected-btn').addEventListener('click', () => {
 
 function trainSpecificCase(stage, id) {
     const config = stageConfig[stage];
-    const specificCase = config.data.find(c => c.id === id);
+    // Cast the HTML string back to a number for F2L/OLL, but leave PLL as strings
+    const searchId = isNaN(id) ? id : parseInt(id, 10);
+    const specificCase = config.data.find(c => c.id === searchId);
+    
     if (specificCase) {
         trainQueue = [specificCase];
         currentTrainIndex = 0;
